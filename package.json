@@ -1,6 +1,6 @@
 {
   "name": "@lilchizh/router-3",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Router",
   "main": "dist/evm.js",
   "module": "dist/evm.mjs",

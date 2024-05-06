@@ -19,8 +19,8 @@ import { getOutputOfPools } from './getOutputOfPools'
 import { getPriceImpact } from './getPriceImpact'
 import { ADDRESS_ZERO } from '@cryptoalgebra/integral-sdk'
 
-const ZERO = 0n
-const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(50n, 100n)
+const ZERO = BigInt(0)
+const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
 
 /**
  * Options for producing the arguments to send calls to the router.
@@ -102,7 +102,7 @@ export abstract class SwapRouter {
     if (trade.tradeType === TradeType.EXACT_INPUT) {
 
       if (trade.inputAmount.currency.isNative) {
-        const exactInputParams = [performAggregatedSlippageCheck ? 0n : amountOut, path, recipient, ADDRESS_ZERO] as const
+        const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
 
         return encodeFunctionData({
           abi: SwapRouter.ABI,
@@ -114,7 +114,7 @@ export abstract class SwapRouter {
       if (trade.outputAmount.currency.isNative) {
         const exactInputParams = [
           amountIn,
-          performAggregatedSlippageCheck ? 0n : amountOut,
+          performAggregatedSlippageCheck ? BigInt(0) : amountOut,
           path,
           recipient,
           ADDRESS_ZERO,
@@ -128,7 +128,7 @@ export abstract class SwapRouter {
 
       }
 
-      const exactInputParams = [amountIn, performAggregatedSlippageCheck ? 0n : amountOut, path, recipient, ADDRESS_ZERO] as const
+      const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
 
       return encodeFunctionData({
         abi: SwapRouter.ABI,
@@ -183,8 +183,8 @@ export abstract class SwapRouter {
             tokenOut: path[1].wrapped.address as Address,
             recipient,
             amountIn,
-            amountOutMinimum: performAggregatedSlippageCheck ? 0n : amountOut,
-            limitSqrtPrice: 0n,
+            amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
+            limitSqrtPrice: BigInt(0),
           }
 
           calldatas.push(
@@ -201,7 +201,7 @@ export abstract class SwapRouter {
             recipient,
             amountOut,
             amountInMaximum: amountIn,
-            limitSqrtPrice: 0n,
+            limitSqrtPrice: BigInt(0),
           }
 
           calldatas.push(
@@ -223,7 +223,7 @@ export abstract class SwapRouter {
             path: pathStr,
             recipient,
             amountIn,
-            amountOutMinimum: performAggregatedSlippageCheck ? 0n : amountOut,
+            amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
           }
 
           calldatas.push(
@@ -359,8 +359,8 @@ export abstract class SwapRouter {
           // special case exists where we are unwrapping WETH output, in which case `routerMustCustody` is set to true
           // and router still holds the funds. That logic bundled into how the value of `recipient` is calculated
           const recipientAddress = lastSectionInRoute ? recipient : ADDRESS_THIS
-          const inAmount = i === 0 ? amountIn : 0n
-          const outAmount = !lastSectionInRoute ? 0n : amountOut
+          const inAmount = i === 0 ? amountIn : BigInt(0)
+          const outAmount = !lastSectionInRoute ? BigInt(0) : amountOut
           if (mixedRouteIsAllV3(newRoute)) {
             const pathStr = encodeMixedRouteToPath(newRoute, !isExactIn)
             if (isExactIn) {
@@ -398,7 +398,7 @@ export abstract class SwapRouter {
             if (isExactIn) {
 
               if (trade.inputAmount.currency.isNative) {
-                const exactInputParams = [performAggregatedSlippageCheck ? 0n : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
             
                 calldatas.push(encodeFunctionData({
                   abi: SwapRouter.ABI,
@@ -407,12 +407,12 @@ export abstract class SwapRouter {
                 }))
               } else if (trade.outputAmount.currency.isNative) {
             
-                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? 0n : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
                 
                 calldatas.push(encodeFunctionData({abi: SwapRouter.ABI, functionName: 'swapExactTokensForETHSupportingFeeOnTransferTokens', args: exactInputParams}))
         
               } else { 
-                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? 0n : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
                 
                 calldatas.push(encodeFunctionData({abi: SwapRouter.ABI, functionName: 'swapExactTokensForTokensSupportingFeeOnTransferTokens', args: exactInputParams}))
               }

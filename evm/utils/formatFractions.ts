@@ -5,10 +5,10 @@ export function formatPercent(percent?: Percent, precision?: number) {
 }
 
 export function formatFraction(fraction?: Fraction | null | undefined, precision: number | undefined = 6) {
-  if (!fraction || fraction.denominator === 0n) {
+  if (!fraction || fraction.denominator === BigInt(0)) {
     return undefined
   }
-  if (fraction.greaterThan(10n ** BigInt(precision))) {
+  if (fraction.greaterThan(BigInt(10) ** BigInt(precision))) {
     return fraction.toFixed(0)
   }
   return fraction.toSignificant(precision)
@@ -25,7 +25,7 @@ export function formatAmount(amount?: CurrencyAmount<Currency> | null | undefine
   if (!amount) {
     return undefined
   }
-  return formatFraction(amount?.asFraction.divide(10n ** BigInt(amount?.currency.decimals)), precision)
+  return formatFraction(amount?.asFraction.divide(BigInt(10) ** BigInt(amount?.currency.decimals)), precision)
 }
 
 export function parseNumberToFraction(num: number, precision = 6) {

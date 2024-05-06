@@ -29,7 +29,7 @@ export function getD({ amplifier, balances }: Params): bigint {
   for (let i = 0; i < 255; i += 1) {
     let dp = d
     for (const b of balances) {
-      dp = (dp * d) / (BigInt(b) * n + 1n)
+      dp = (dp * d) / (BigInt(b) * n + BigInt(1))
     }
     dPrev = d
     d = ((ann * sum + dp * n) * d) / ((ann - ONE) * d + (n + ONE) * dp)
@@ -96,7 +96,7 @@ export function getY({ amplifier, balances, i, j, x }: GetYParams): bigint {
   let y = d
   for (let k = 0; k < 255; k += 1) {
     yPrev = y
-    y = (y * y + c) / (2n * y + b - d)
+    y = (y * y + c) / (BigInt(2) * y + b - d)
 
     if (y > yPrev && y - yPrev <= precision) {
       break

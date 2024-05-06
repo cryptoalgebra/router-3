@@ -387,7 +387,7 @@ export function getBestSwapRouteBy(
   // if on L2, its the gas used on the L2 based on hops and ticks across all the routes
   const estimatedGasUsed = bestSwap
     .map((routeWithValidQuote) => routeWithValidQuote.gasEstimate)
-    .reduce((sum, routeWithValidQuote) => sum + routeWithValidQuote, 0n)
+    .reduce((sum, routeWithValidQuote) => sum + routeWithValidQuote, BigInt(0))
 
   if (!usdGasTokensByChain[chainId] || !usdGasTokensByChain[chainId]![0]) {
     // Each route can use a different stablecoin to account its gas costs.
@@ -400,7 +400,7 @@ export function getBestSwapRouteBy(
 
   // if on L2, calculate the L1 security fee
   const gasCostsL1ToL2: L1ToL2GasCosts = {
-    gasUsedL1: 0n,
+    gasUsedL1: BigInt(0),
     gasCostL1USD: CurrencyAmount.fromRawAmount(usdToken, 0),
     gasCostL1QuoteToken: CurrencyAmount.fromRawAmount(
       // eslint-disable-next-line @typescript-eslint/no-non-null-asserted-optional-chain
@@ -432,7 +432,7 @@ export function getBestSwapRouteBy(
 
     return CurrencyAmount.fromRawAmount(
       usdToken,
-      routeWithValidQuote.gasCostInUSD.quotient * 10n ** BigInt(decimalsDiff),
+      routeWithValidQuote.gasCostInUSD.quotient * BigInt(10) ** BigInt(decimalsDiff),
     )
   })
 
@@ -442,7 +442,7 @@ export function getBestSwapRouteBy(
   if (!estimatedGasUsedUSD.currency.equals(gasCostL1USD.currency)) {
     const decimalsDiff = usdTokenDecimals - gasCostL1USD.currency.decimals
     estimatedGasUsedUSD = estimatedGasUsedUSD.add(
-      CurrencyAmount.fromRawAmount(usdToken, gasCostL1USD.quotient * 10n ** BigInt(decimalsDiff)),
+      CurrencyAmount.fromRawAmount(usdToken, gasCostL1USD.quotient * BigInt(10) ** BigInt(decimalsDiff)),
     )
   } else {
     estimatedGasUsedUSD = estimatedGasUsedUSD.add(gasCostL1USD)

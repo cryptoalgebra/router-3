@@ -146,7 +146,7 @@ function createGetV3Quote(isExactIn = true) {
         : await v3Pool.getInputAmount(amount.wrapped)
 
       // Not enough liquidity to perform the swap
-      if (quote.quotient <= 0n) {
+      if (quote.quotient <= BigInt(0)) {
         return null
       }
 

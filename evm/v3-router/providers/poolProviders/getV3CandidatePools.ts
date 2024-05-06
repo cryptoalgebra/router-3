@@ -40,7 +40,7 @@ export interface V3PoolTvlReference extends Pick<V3PoolWithTvl, 'address'> {
 const getV3PoolTvl = memoize(
   (pools: V3PoolTvlReference[], poolAddress: Address) => {
     const poolWithTvl = pools.find((p) => p.address === poolAddress)
-    return poolWithTvl?.tvlUSD || 0n
+    return poolWithTvl?.tvlUSD || BigInt(0)
   },
   (_, poolAddress) => poolAddress,
 )

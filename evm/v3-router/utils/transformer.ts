@@ -5,7 +5,7 @@ import { ADDRESS_ZERO } from '@pancakeswap/v3-sdk'
 import { Pool, PoolType, Route, SmartRouterTrade, StablePool, V2Pool, V3Pool } from '../types'
 import { isStablePool, isV2Pool, isV3Pool } from './pool'
 
-const ONE_HUNDRED = 100n
+const ONE_HUNDRED = BigInt(100)
 
 export interface SerializedCurrency {
   address: Address
@@ -163,7 +163,7 @@ export function parsePool(chainId: ChainId, pool: SerializedPool): Pool {
       ...pool,
       balances: pool.balances.map((b) => parseCurrencyAmount(chainId, b)),
       amplifier: BigInt(pool.amplifier),
-      fee: new Percent(parseFloat(pool.fee) * 1000000, ONE_HUNDRED * 1000000n),
+      fee: new Percent(parseFloat(pool.fee) * 1000000, ONE_HUNDRED * BigInt(1000000)),
     }
   }
 

@@ -85,7 +85,7 @@ export async function createGasModel({
      * add the BASE_SWAP_COST to each section.
      */
     const poolTypeSet = new Set<PoolType>()
-    let baseGasUse = 0n
+    let baseGasUse = BigInt(0)
 
     for (const pool of pools) {
       const { type } = pool
@@ -120,7 +120,7 @@ export async function createGasModel({
     }
 
     const tickGasUse = COST_PER_INIT_TICK(chainId) * totalInitializedTicksCrossed
-    const uninitializedTickGasUse = COST_PER_UNINIT_TICK * 0n
+    const uninitializedTickGasUse = COST_PER_UNINIT_TICK * BigInt(0)
 
     // base estimate gas used based on chainId estimates for hops and ticks gas useage
     baseGasUse = baseGasUse + tickGasUse + uninitializedTickGasUse

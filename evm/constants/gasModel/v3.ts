@@ -1,7 +1,7 @@
 import { ChainId } from '@pancakeswap/chains'
 
 // Cost for crossing an uninitialized tick.
-export const COST_PER_UNINIT_TICK = 0n
+export const COST_PER_UNINIT_TICK = BigInt(0)
 
 export const BASE_SWAP_COST_V3 = (id: ChainId): bigint => {
   switch (id) {
@@ -15,9 +15,9 @@ export const BASE_SWAP_COST_V3 = (id: ChainId): bigint => {
     case ChainId.POLYGON_ZKEVM_TESTNET:
     case ChainId.OPBNB:
     case ChainId.OPBNB_TESTNET:
-      return 2000n
+      return BigInt(2000)
     default:
-      return 0n
+      return BigInt(0)
   }
 }
 export const COST_PER_INIT_TICK = (id: ChainId): bigint => {
@@ -32,9 +32,9 @@ export const COST_PER_INIT_TICK = (id: ChainId): bigint => {
     case ChainId.POLYGON_ZKEVM_TESTNET:
     case ChainId.OPBNB:
     case ChainId.OPBNB_TESTNET:
-      return 31000n
+      return BigInt(31000)
     default:
-      return 0n
+      return BigInt(0)
   }
 }
 
@@ -50,8 +50,8 @@ export const COST_PER_HOP_V3 = (id: ChainId): bigint => {
     case ChainId.POLYGON_ZKEVM_TESTNET:
     case ChainId.OPBNB:
     case ChainId.OPBNB_TESTNET:
-      return 80000n
+      return BigInt(80000)
     default:
-      return 0n
+      return BigInt(0)
   }
 }

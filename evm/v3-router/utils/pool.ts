@@ -134,5 +134,5 @@ export function getTokenPrice(pool: Pool, base: Currency, quote: Currency): Pric
       quoteAmount: quoteOut,
     })
   }
-  return new Price(base, quote, 1n, 0n)
+  return new Price(base, quote, BigInt(1), BigInt(0))
 }

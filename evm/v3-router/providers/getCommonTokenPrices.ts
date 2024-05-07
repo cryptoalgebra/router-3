@@ -1,4 +1,4 @@
-import { ChainId, getLlamaChainName } from '@pancakeswap/chains'
+import { ChainId, getLlamaChainName } from '../../chains/src'
 import { Currency, Token } from '@pancakeswap/sdk'
 import { gql } from 'graphql-request'
 import { Address, getAddress } from 'viem'
@@ -11,7 +11,7 @@ const tokenPriceQuery = gql`
   query getTokens($pageSize: Int!, $tokenAddrs: [ID!]) {
     tokens(first: $pageSize, where: { id_in: $tokenAddrs }) {
       id
-      derivedUSD
+      derivedUSD: derivedMatic
     }
   }
 `
@@ -129,7 +129,7 @@ const createGetTokenPriceFromLlmaWithCache = ({
       .join(',')
     const result: { coins?: { [key: string]: { price: string } } } = await fetch(`${endpoint}/${list}`).then((res) =>
       res.json(),
-    )
+    ) as any
 
     const { coins = {} } = result
     return [
@@ -157,15 +157,6 @@ export const getCommonTokenPricesByWalletApi = createCommonTokenPriceProvider<By
 )
 
 export const getCommonTokenPrices = withFallback([
-  {
-    asyncFn: ({ currencyA, currencyB }: ParamsWithFallback) => getCommonTokenPricesByLlma({ currencyA, currencyB }),
-    timeout: 3000,
-  },
-  {
-    asyncFn: ({ currencyA, currencyB }: ParamsWithFallback) =>
-      getCommonTokenPricesByWalletApi({ currencyA, currencyB }),
-    timeout: 3000,
-  },
   {
     asyncFn: ({ currencyA, currencyB, v3SubgraphProvider }: ParamsWithFallback) =>
       getCommonTokenPricesBySubgraph({ currencyA, currencyB, provider: v3SubgraphProvider }),

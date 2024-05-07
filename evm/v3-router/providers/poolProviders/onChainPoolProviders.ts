@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../../chains/src'
 import { BigintIsh, Currency, CurrencyAmount, Percent } from '@pancakeswap/sdk'
 import { deserializeToken } from '@pancakeswap/token-lists'
 import { FeeAmount, parseProtocolFees } from '@pancakeswap/v3-sdk'

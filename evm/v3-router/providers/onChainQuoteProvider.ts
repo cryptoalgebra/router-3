@@ -1,11 +1,11 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { BigintIsh, Currency, CurrencyAmount } from '@pancakeswap/sdk'
 import { AbortControl, isAbortError } from '../../utils/abortControl'
 import retry from 'async-retry'
 import { Abi, Address } from 'viem'
 
-import { mixedRouteQuoterV1ABI } from '../../abis/IMixedRouteQuoterV1'
-import { quoterV2ABI } from '../../abis/IQuoterV2'
+import { mixedRouteQuoterV1ABI } from '../../abis/algebra/IMixedRouteQuoterV1'
+import { algebraQuoterABI } from '../../abis/algebra/IQuoter'
 import { MIXED_ROUTE_QUOTER_ADDRESSES, V3_QUOTER_ADDRESSES } from '../../constants'
 import { BATCH_MULTICALL_CONFIGS } from '../../constants/multicall'
 import { BatchMulticallConfigs, ChainMap } from '../../types'
@@ -25,26 +25,6 @@ import { PancakeMulticallProvider } from './multicallSwapProvider'
 const DEFAULT_BATCH_RETRIES = 2
 
 const SUCCESS_RATE_CONFIG = {
-  [ChainId.BSC_TESTNET]: 0.1,
-  [ChainId.BSC]: 0.1,
-  [ChainId.ETHEREUM]: 0.1,
-  [ChainId.GOERLI]: 0.1,
-  [ChainId.ARBITRUM_ONE]: 0.1,
-  [ChainId.ARBITRUM_GOERLI]: 0.1,
-  [ChainId.POLYGON_ZKEVM]: 0.01,
-  [ChainId.POLYGON_ZKEVM_TESTNET]: 0,
-  [ChainId.ZKSYNC]: 0.2,
-  [ChainId.ZKSYNC_TESTNET]: 0.1,
-  [ChainId.LINEA]: 0.1,
-  [ChainId.LINEA_TESTNET]: 0.1,
-  [ChainId.OPBNB]: 0.1,
-  [ChainId.OPBNB_TESTNET]: 0.1,
-  [ChainId.BASE]: 0.1,
-  [ChainId.BASE_TESTNET]: 0.1,
-  [ChainId.SCROLL_SEPOLIA]: 0.1,
-  [ChainId.SEPOLIA]: 0.1,
-  [ChainId.ARBITRUM_SEPOLIA]: 0.1,
-  [ChainId.BASE_SEPOLIA]: 0.1,
   [ChainId.HOLESKY]: 0.1,
 } as const satisfies Record<ChainId, number>
 
@@ -154,7 +134,7 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
         const multicallConfigs =
           multicallConfigsOverride?.[chainId as ChainId] ||
           BATCH_MULTICALL_CONFIGS[chainId as ChainId] ||
-          BATCH_MULTICALL_CONFIGS[ChainId.ETHEREUM]
+          BATCH_MULTICALL_CONFIGS[ChainId.HOLESKY]
         const {
           defaultConfig: { gasLimitPerCall: defaultGasLimitPerCall, dropUnexecutedCalls },
         } = multicallConfigs
@@ -435,7 +415,7 @@ export const createMixedRouteOnChainQuoteProvider = onChainQuoteProviderFactory(
 export const createV3OnChainQuoteProvider = onChainQuoteProviderFactory({
   getQuoterAddress: (chainId) => V3_QUOTER_ADDRESSES[chainId],
   getQuoteFunctionName: (isExactIn) => (isExactIn ? 'quoteExactInput' : 'quoteExactOutput'),
-  abi: quoterV2ABI,
+  abi: algebraQuoterABI,
   getCallInputs: (route, isExactIn) => [
     encodeMixedRouteToPath(route, !isExactIn),
     `0x${route.amount.quotient.toString(16)}`,

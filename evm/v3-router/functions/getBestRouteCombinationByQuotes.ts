@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { Currency, CurrencyAmount, TradeType } from '@pancakeswap/sdk'
 import flatMap from 'lodash/flatMap.js'
 import mapValues from 'lodash/mapValues.js'

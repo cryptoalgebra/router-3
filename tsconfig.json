@@ -1,17 +1,17 @@
 {
   "extends": "./base",
-  "include": ["./evm", "./modules/Holesky.ts",],
+  "include": ["./evm", "modules/Holesky.ts",],
   "exclude": ["**/*.test.ts", "./dist/**"],
   "compilerOptions": {
     "rootDir": "./",
     "outDir": "./dist",
-    "target": "ES2018",
-    "lib": ["ES2018"],
+    "target": "ES2020",
+    "lib": ["ES2020"],
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "skipLibCheck": true,
     "moduleResolution": "Node",
-    "allowJs": true
+    "allowJs": true,
   }
 }

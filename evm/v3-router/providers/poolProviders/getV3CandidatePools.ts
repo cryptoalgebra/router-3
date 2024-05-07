@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../../chains/src'
 import { BigintIsh, Currency } from '@pancakeswap/sdk'
 import memoize from 'lodash/memoize.js'
 import { Address } from 'viem'

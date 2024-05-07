@@ -1,5 +1,5 @@
 import { TradeType } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../chains/src'
 import { FeeAmount } from '@pancakeswap/v3-sdk'
 import { Address } from 'viem'
 import { z } from 'zod'

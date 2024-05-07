@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../../chains/src'
 import { Currency, Token } from '@pancakeswap/sdk'
 import tryParseAmount from '../../../utils/tryParseAmount'
 import { FeeAmount, Pool, parseProtocolFees } from '@pancakeswap/v3-sdk'

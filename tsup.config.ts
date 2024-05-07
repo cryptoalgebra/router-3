@@ -6,7 +6,7 @@ export default defineConfig((options) => ({
     evm: 'evm/index.ts'
   },
   format: ['esm', 'cjs'],
-  target: 'es2018',
+  target: 'es2020',
   skipNodeModulesBundle: true,
   dts: false,
   treeshake: true,

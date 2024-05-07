@@ -1,6 +1,6 @@
 import { Currency, BigintIsh } from '@pancakeswap/sdk'
 import { AbortControl } from '../../utils/abortControl'
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { PublicClient } from 'viem'
 import type { GraphQLClient } from 'graphql-request'
 import type { Options as RetryOptions } from 'async-retry'

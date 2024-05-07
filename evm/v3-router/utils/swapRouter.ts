@@ -1,6 +1,6 @@
 import { encodeFunctionData, Hex, Address } from 'viem'
 import { Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { FeeOptions, MethodParameters, Payments, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
 import invariant from 'tiny-invariant'
 
@@ -18,6 +18,7 @@ import { buildBaseRoute } from './route'
 import { getOutputOfPools } from './getOutputOfPools'
 import { getPriceImpact } from './getPriceImpact'
 import { ADDRESS_ZERO } from '@cryptoalgebra/integral-sdk'
+import { holeskyTokens } from '../../constants/holeskyTokens'
 
 const ZERO = BigInt(0)
 const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
@@ -102,7 +103,7 @@ export abstract class SwapRouter {
     if (trade.tradeType === TradeType.EXACT_INPUT) {
 
       if (trade.inputAmount.currency.isNative) {
-        const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
+        const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient] as const
 
         return encodeFunctionData({
           abi: SwapRouter.ABI,
@@ -117,7 +118,6 @@ export abstract class SwapRouter {
           performAggregatedSlippageCheck ? BigInt(0) : amountOut,
           path,
           recipient,
-          ADDRESS_ZERO,
         ] as const
 
         return encodeFunctionData({
@@ -128,7 +128,7 @@ export abstract class SwapRouter {
 
       }
 
-      const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
+      const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient] as const
 
       return encodeFunctionData({
         abi: SwapRouter.ABI,
@@ -137,7 +137,7 @@ export abstract class SwapRouter {
       })
     }
 
-    const exactOutputParams = [amountOut, amountIn, path, recipient, ADDRESS_ZERO] as const
+    const exactOutputParams = [amountOut, amountIn, path, recipient] as const
 
     return encodeFunctionData({
       abi: SwapRouter.ABI,
@@ -398,7 +398,7 @@ export abstract class SwapRouter {
             if (isExactIn) {
 
               if (trade.inputAmount.currency.isNative) {
-                const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient] as const
             
                 calldatas.push(encodeFunctionData({
                   abi: SwapRouter.ABI,
@@ -407,18 +407,18 @@ export abstract class SwapRouter {
                 }))
               } else if (trade.outputAmount.currency.isNative) {
             
-                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient] as const
                 
                 calldatas.push(encodeFunctionData({abi: SwapRouter.ABI, functionName: 'swapExactTokensForETHSupportingFeeOnTransferTokens', args: exactInputParams}))
         
               } else { 
-                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient, ADDRESS_ZERO] as const
+                const exactInputParams = [amountIn, performAggregatedSlippageCheck ? BigInt(0) : amountOut, path, recipient] as const
                 
                 calldatas.push(encodeFunctionData({abi: SwapRouter.ABI, functionName: 'swapExactTokensForTokensSupportingFeeOnTransferTokens', args: exactInputParams}))
               }
 
             } else {
-              const exactOutputParams = [outAmount, inAmount, path, recipientAddress, ADDRESS_ZERO] as const
+              const exactOutputParams = [outAmount, inAmount, path, recipientAddress] as const
 
               calldatas.push(
                 encodeFunctionData({
@@ -631,8 +631,8 @@ export abstract class SwapRouter {
     const { positionAmountIn, positionAmountOut } = SwapRouter.getPositionAmounts(position, zeroForOne)
 
     // if tokens are native they will be converted to WETH9
-    const tokenIn = inputIsNative ? WNATIVE[chainId as ChainId] : positionAmountIn.currency.wrapped
-    const tokenOut = outputIsNative ? WNATIVE[chainId as ChainId] : positionAmountOut.currency.wrapped
+    const tokenIn = inputIsNative ? holeskyTokens.weth : positionAmountIn.currency.wrapped
+    const tokenOut = outputIsNative ? holeskyTokens.weth : positionAmountOut.currency.wrapped
 
     // if swap output does not make up whole outputTokenBalanceDesired, pull in remaining tokens for adding liquidity
     const amountOutRemaining = positionAmountOut.subtract(quoteAmountOut.wrapped)

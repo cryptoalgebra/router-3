@@ -10,15 +10,14 @@ import { Pool, PoolType, StablePool, V2Pool, V3Pool } from '../types'
 
 export function computePairAddress(token0: Token, token1: Token) {
   const salt = keccak256(
-    encodePacked(['address', 'address'], [token0.address as Address, token1.address as Address])
+    encodePacked(['address', 'address', 'bool'], [token0.address as Address, token1.address as Address, false])
   )
   return getCreate2Address({
-    from: '0x6EcCab422D763aC031210895C81787E87B43A652',
+    from: '0x8C6f64642bc9433D57C505A448248f445F7DDee7',
     salt,
-    bytecodeHash: '0xa856464ae65f7619087bc369daaf7e387dae1e5af69cfa7935850ebf754b04c1'
+    bytecodeHash: '0x664a0deaa7261823d82ee0c235235765b5e53199c871313fbdcdda2667878924'
   })
 }
-
 
 export function isV2Pool(pool: Pool): pool is V2Pool {
   return pool.type === PoolType.V2

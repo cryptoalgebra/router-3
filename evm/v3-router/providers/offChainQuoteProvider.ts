@@ -12,7 +12,7 @@ import {
   V3Pool as IV3Pool,
 } from '../types'
 import * as StableSwap from '../../stableSwap'
-import { getOutputCurrency, isStablePool, isV2Pool, isV3Pool } from '../utils'
+import { computePairAddress, getOutputCurrency, isStablePool, isV2Pool, isV3Pool } from '../utils'
 
 export function createOffChainQuoteProvider(): QuoteProvider {
   const createGetRoutesWithQuotes = (isExactIn = true) => {
@@ -110,6 +110,7 @@ function createGetV2Quote(isExactIn = true) {
     { reserve0, reserve1 }: V2Pool,
     amount: CurrencyAmount<Currency>,
   ): CurrencyAmount<Currency> {
+    Pair.getAddress = computePairAddress
     const pair = new Pair(reserve0.wrapped, reserve1.wrapped)
     const [quote] = isExactIn ? pair.getOutputAmount(amount.wrapped) : pair.getInputAmount(amount.wrapped)
     return quote

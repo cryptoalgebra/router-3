@@ -27,7 +27,7 @@ import {
 } from '@pancakeswap/tokens'
 
 import { ChainMap, ChainTokenList } from '../types'
-import { ALGEBRA_ROUTER, ROUTER_V2, SWAP_ROUTER_02 } from './addresses'
+import { ROUTER_V2, SWAP_ROUTER_02 } from './addresses'
 import { holeskyTokens } from './holeskyTokens'
 
 export const SMART_ROUTER_ADDRESSES = {
@@ -75,7 +75,7 @@ export const V2_ROUTER_ADDRESS: ChainMap<string> = {
   [ChainId.SEPOLIA]: '0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb',
   [ChainId.ARBITRUM_SEPOLIA]: '0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb',
   [ChainId.BASE_SEPOLIA]: '0x8cFe327CEc66d1C090Dd72bd0FF11d690C33a2Eb',
-  [ChainId.HOLESKY]: '0x'
+  [ChainId.HOLESKY]: ROUTER_V2
 }
 
 export const STABLE_SWAP_INFO_ADDRESS: ChainMap<string> = {

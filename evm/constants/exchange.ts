@@ -2,7 +2,7 @@ import { ChainId } from '../chains/src'
 import { Token } from '@pancakeswap/sdk'
 
 import { ChainMap, ChainTokenList } from '../types'
-import { ALGEBRA_ROUTER, ROUTER_V2, SWAP_ROUTER_02 } from './addresses'
+import { ROUTER_V2, SWAP_ROUTER_02 } from './addresses'
 import { holeskyTokens } from './holeskyTokens'
 
 export const SMART_ROUTER_ADDRESSES = {

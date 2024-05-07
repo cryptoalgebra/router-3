@@ -389,25 +389,25 @@ export const createMixedRouteOnChainQuoteProvider = onChainQuoteProviderFactory(
   abi: mixedRouteQuoterV1ABI,
   getCallInputs: (route, isExactIn) => [
     encodeMixedRouteToPath(route, !isExactIn),
-    route.pools
-      .map((pool) => {
-        if (isV3Pool(pool)) {
-          return 0
-        }
-        if (isV2Pool(pool)) {
-          return 1
-        }
-        if (isStablePool(pool)) {
-          if (pool.balances.length === 2) {
-            return 2
-          }
-          if (pool.balances.length === 3) {
-            return 3
-          }
-        }
-        return -1
-      })
-      .filter((index) => index >= 0),
+    // route.pools
+    //   .map((pool) => {
+    //     if (isV3Pool(pool)) {
+    //       return 0
+    //     }
+    //     if (isV2Pool(pool)) {
+    //       return 1
+    //     }
+    //     if (isStablePool(pool)) {
+    //       if (pool.balances.length === 2) {
+    //         return 2
+    //       }
+    //       if (pool.balances.length === 3) {
+    //         return 3
+    //       }
+    //     }
+    //     return -1
+    //   })
+    //   .filter((index) => index >= 0),
     `0x${route.amount.quotient.toString(16)}`,
   ],
 })

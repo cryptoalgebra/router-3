@@ -25,14 +25,14 @@ export function encodeMixedRouteToPath(route: BaseRoute, exactOutput: boolean): 
       if (index === 0) {
         return {
           inputToken: outputToken,
-          types: isV3Pool(pool) ? ['address', 'address'] : ['address', 'uint24', 'address'],
-          path: isV3Pool(pool) ? [inputToken.address, outputToken.address] : [inputToken.address, fee, outputToken.address],
+          types: !isV3Pool(pool) ? ['address', "uint24", 'address'] : ['address', 'uint24', 'address'],
+          path: !isV3Pool(pool) ? [inputToken.address, 0, outputToken.address] : [inputToken.address, fee, outputToken.address],
         }
       }
       return {
         inputToken: outputToken,
-        types: isV3Pool(pool) ? [...types, 'address'] : [...types, 'uint24', 'address'],
-        path: isV3Pool(pool) ? [...path, outputToken.address] : [...path, fee, outputToken.address],
+        types: !isV3Pool(pool) ? [...types, "uint24", 'address'] : [...types, 'uint24', 'address'],
+        path: !isV3Pool(pool) ? [...path, 0, outputToken.address] : [...path, fee, outputToken.address],
       }
     },
     { inputToken: firstInputToken, path: [], types: [] },

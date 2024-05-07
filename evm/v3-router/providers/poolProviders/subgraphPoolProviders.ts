@@ -2,7 +2,7 @@ import { ChainId } from '@pancakeswap/chains'
 import { Currency, Token } from '@pancakeswap/sdk'
 import tryParseAmount from '../../../utils/tryParseAmount'
 import { FeeAmount, Pool, parseProtocolFees } from '@pancakeswap/v3-sdk'
-import { computePoolAddress } from '@cryptoalgebra/integral-sdk'
+import { POOL_DEPLOYER_ADDRESSES, computePoolAddress } from '@cryptoalgebra/integral-sdk'
 import type { GraphQLClient } from 'graphql-request'
 import { gql } from 'graphql-request'
 import memoize from 'lodash/memoize.js'
@@ -11,6 +11,7 @@ import { Address, getAddress } from 'viem'
 import { PoolType, SubgraphProvider, V2PoolWithTvl, V3PoolWithTvl, WithTvl } from '../../types'
 import { computeV2PoolAddress, logger, metric } from '../../utils'
 import { PoolMeta, V3PoolMeta } from './internalTypes'
+import { ALGEBRA_POOL_DEPLOYER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
 
 interface FactoryParams<M extends PoolMeta, P extends WithTvl> {
   // Function identifier
@@ -76,7 +77,10 @@ function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
 
 const getV3PoolMeta = memoize(
   ([currencyA, currencyB, feeAmount]: [Currency, Currency, FeeAmount]) => ({
-    address: computePoolAddress({tokenA: currencyA.wrapped, tokenB: currencyB.wrapped, poolDeployer: '0x6Dd3FB9653B10e806650F107C3B5A0a6fF974F65', initCodeHashManualOverride: '0x6c1bebd370ba84753516bc1393c0d0a6c645856da55f5393ac8ab3d6dbc861d3'}) as Address,
+    address: computePoolAddress({tokenA: currencyA.wrapped,
+      tokenB: currencyB.wrapped,
+      poolDeployer: ALGEBRA_POOL_DEPLOYER,
+      initCodeHashManualOverride: POOL_INIT_CODE_HASH}) as Address,
     currencyA,
     currencyB,
     fee: feeAmount,

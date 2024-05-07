@@ -1,5 +1,6 @@
 import { ChainId } from '@pancakeswap/chains'
 import { Address } from 'viem'
+import { ALGEBRA_QUOTER, MIXED_ROUTE_QUOTER_V1 } from './addresses'
 
 // = 1 << 23 or 100000000000000000000000
 export const V2_FEE_PATH_PLACEHOLDER = 8388608
@@ -28,6 +29,7 @@ export const MIXED_ROUTE_QUOTER_ADDRESSES = {
   [ChainId.SEPOLIA]: '0x4c650FB471fe4e0f476fD3437C3411B1122c4e3B',
   [ChainId.ARBITRUM_SEPOLIA]: '0x4c650FB471fe4e0f476fD3437C3411B1122c4e3B',
   [ChainId.BASE_SEPOLIA]: '0x4c650FB471fe4e0f476fD3437C3411B1122c4e3B',
+  [ChainId.HOLESKY]: MIXED_ROUTE_QUOTER_V1
 } as const satisfies Record<ChainId, Address>
 
 export const V3_QUOTER_ADDRESSES = {
@@ -51,4 +53,5 @@ export const V3_QUOTER_ADDRESSES = {
   [ChainId.SEPOLIA]: '0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997',
   [ChainId.ARBITRUM_SEPOLIA]: '0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997',
   [ChainId.BASE_SEPOLIA]: '0xB048Bbc1Ee6b733FFfCFb9e9CeF7375518e25997',
+  [ChainId.HOLESKY]: ALGEBRA_QUOTER
 } as const satisfies Record<ChainId, Address>

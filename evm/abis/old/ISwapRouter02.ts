@@ -919,6 +919,11 @@ export const swapRouter02Abi = [
         "internalType": "address",
         "name": "to",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "referrer",
+        "type": "address"
       }
     ],
     "name": "swapExactETHForTokensSupportingFeeOnTransferTokens",
@@ -947,6 +952,11 @@ export const swapRouter02Abi = [
         "internalType": "address",
         "name": "to",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "referrer",
+        "type": "address"
       }
     ],
     "name": "swapExactTokensForETHSupportingFeeOnTransferTokens",
@@ -974,6 +984,11 @@ export const swapRouter02Abi = [
       {
         "internalType": "address",
         "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "referrer",
         "type": "address"
       }
     ],

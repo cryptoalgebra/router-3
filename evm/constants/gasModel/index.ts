@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '@pancakeswap/sdk'
 import { Token } from '@pancakeswap/sdk'
 import {
   arbSepoliaTokens,
@@ -21,6 +21,7 @@ import {
   zkSyncTestnetTokens,
   zksyncTokens,
 } from '@pancakeswap/tokens'
+import { holeskyTokens } from '../holeskyTokens'
 
 export const usdGasTokensByChain = {
   [ChainId.ETHEREUM]: [ethereumTokens.usdt],
@@ -43,6 +44,7 @@ export const usdGasTokensByChain = {
   [ChainId.SEPOLIA]: [scrollSepoliaTokens.usdc],
   [ChainId.ARBITRUM_SEPOLIA]: [arbSepoliaTokens.usdc],
   [ChainId.BASE_SEPOLIA]: [baseSepoliaTokens.usdc],
+  [ChainId.HOLESKY]: [holeskyTokens.usdt]
 } satisfies Record<ChainId, Token[]>
 
 export * from './stableSwap'

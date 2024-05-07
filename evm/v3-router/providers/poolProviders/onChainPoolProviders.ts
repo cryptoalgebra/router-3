@@ -11,6 +11,7 @@ import { getStableSwapPools } from '../../../constants/stableSwap'
 import { OnChainProvider, Pool, PoolType, StablePool, V2Pool, V3Pool } from '../../types'
 import { computeV2PoolAddress, computeV3PoolAddress } from '../../utils'
 import { PoolMeta, V3PoolMeta } from './internalTypes'
+import { ALGEBRA_POOL_DEPLOYER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
 
 export const getV2PoolsOnChain = createOnChainPoolFactory<V2Pool, PoolMeta>({
   abi: pancakePairABI,
@@ -111,10 +112,10 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3
   getPossiblePoolMetas: ([currencyA, currencyB]) => {
     return [FeeAmount.LOWEST].map((fee) => ({
       address: computeV3PoolAddress({
-        poolDeployer: '0x6Dd3FB9653B10e806650F107C3B5A0a6fF974F65',
+        poolDeployer: ALGEBRA_POOL_DEPLOYER,
         tokenA: currencyA.wrapped,
         tokenB: currencyB.wrapped,
-        initCodeHashManualOverride: '0x6c1bebd370ba84753516bc1393c0d0a6c645856da55f5393ac8ab3d6dbc861d3'
+        initCodeHashManualOverride: POOL_INIT_CODE_HASH
       }) as Address,
       currencyA,
       currencyB,

@@ -1,6 +1,6 @@
 {
   "extends": "./base",
-  "include": ["./evm"],
+  "include": ["./evm", "./modules/Holesky.ts",],
   "exclude": ["**/*.test.ts", "./dist/**"],
   "compilerOptions": {
     "rootDir": "./",

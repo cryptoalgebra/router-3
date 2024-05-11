@@ -1,11 +1,13 @@
 {
-  "name": "@cryptoalgebra/router-3",
-  "version": "1.0.2",
+  "name": "@cryptoalgebra/router-holesky",
   "description": "Router",
   "main": "dist/evm.js",
   "module": "dist/evm.mjs",
   "types": "dist/evm/index.d.ts",
   "sideEffects": false,
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",
@@ -53,5 +55,6 @@
       "import": "./dist/evm.mjs",
       "require": "./dist/evm.js"
     }
-  }
+  },
+  "version": "1.0.0"
 }

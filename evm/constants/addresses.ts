@@ -28,7 +28,7 @@ export const TRADE_HELPER: Address =
 
 /* Multi */
 export const SWAP_ROUTER_02: Address =
-    '0x16AB999fb9f1fF6633c2b6b1C707721377887921';
+    '0xf6346A32106EBc62E8348420834Aad12c3DC66e2';
 
 export const MIXED_ROUTE_QUOTER_V1: Address =
-    '0x9b7b1f3d29475f54e31e10a74e04b8437585f6da'; // in use
+    '0xC5E1Bd7F3d5734Ca81D021F46Af5A23F1d9DDD6b'; // in use

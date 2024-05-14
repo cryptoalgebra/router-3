@@ -2,7 +2,7 @@ import { Hex, encodePacked } from 'viem'
 import { Token } from '@pancakeswap/sdk'
 
 import { BaseRoute, Pool } from '../types'
-import { getOutputCurrency, isV3Pool } from './pool'
+import { getOutputCurrency, isStablePool, isV2Pool, isV3Pool } from './pool'
 import { V2_FEE_PATH_PLACEHOLDER } from '../../constants'
 
 /**
@@ -10,7 +10,7 @@ import { V2_FEE_PATH_PLACEHOLDER } from '../../constants'
  * @param route the mixed path to convert to an encoded path
  * @returns the encoded path
  */
-export function encodeMixedRouteToPath(route: BaseRoute, exactOutput: boolean): Hex {
+export function encodeMixedRouteToPath(route: BaseRoute, exactOutput: boolean, isV3Only: boolean): Hex {
   const firstInputToken: Token = route.input.wrapped
 
   const { path, types } = route.pools.reduce(
@@ -21,18 +21,20 @@ export function encodeMixedRouteToPath(route: BaseRoute, exactOutput: boolean): 
       index,
     ): { inputToken: Token; path: (string | number)[]; types: string[] } => {
       const outputToken = getOutputCurrency(pool, inputToken).wrapped
-      const fee = isV3Pool(pool) ? pool.fee : V2_FEE_PATH_PLACEHOLDER
+
+      const version = isV3Pool(pool) ? 0 : isStablePool(pool) ? 2 : isV2Pool(pool) ? 1 : -1 
+
       if (index === 0) {
         return {
           inputToken: outputToken,
-          types: !isV3Pool(pool) ? ['address', "uint24", 'address'] : ['address', 'uint24', 'address'],
-          path: !isV3Pool(pool) ? [inputToken.address, 0, outputToken.address] : [inputToken.address, fee, outputToken.address],
+          types: isV3Only ? ['address', 'address'] : ['address', "uint24", 'address'],
+          path: isV3Only ? [inputToken.address, outputToken.address] : [inputToken.address, version, outputToken.address]
         }
       }
       return {
         inputToken: outputToken,
-        types: !isV3Pool(pool) ? [...types, "uint24", 'address'] : [...types, 'uint24', 'address'],
-        path: !isV3Pool(pool) ? [...path, 0, outputToken.address] : [...path, fee, outputToken.address],
+        types: isV3Only ? [...types, 'address'] : [...types, "uint24", 'address'],
+        path: isV3Only ? [...path, outputToken.address] : [...path, version, outputToken.address]
       }
     },
     { inputToken: firstInputToken, path: [], types: [] },

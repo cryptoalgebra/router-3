@@ -1,5 +1,5 @@
 Arguments: 
-  /home/lilchizh/.nvm/versions/node/v18.19.1/bin/node /home/lilchizh/.yarn/releases/yarn-classic.cjs
+  /home/lilchizh/.nvm/versions/node/v18.19.1/bin/node /home/lilchizh/.yarn/releases/yarn-classic.cjs publish
 
 PATH: 
   /home/lilchizh/.local/share/pnpm:/home/lilchizh/.nvm/versions/node/v18.19.1/bin:/home/lilchizh/.local/bin:/home/lilchizh/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
@@ -14,27 +14,29 @@ Platform:
   linux x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@pancakeswap%2futils: Not found
-      at params.callback [as _callback] (/home/lilchizh/.yarn/releases/yarn-classic.cjs:77675:18)
-      at self.callback (/home/lilchizh/.yarn/releases/yarn-classic.cjs:135297:22)
-      at Request.emit (node:events:517:28)
-      at Request.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:136269:10)
-      at Request.emit (node:events:517:28)
-      at IncomingMessage.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:136191:12)
-      at Object.onceWrapper (node:events:631:28)
-      at IncomingMessage.emit (node:events:529:35)
-      at endReadableNT (node:internal/streams/readable:1400:12)
-      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+  Error: canceled
+      at Interface.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:131557:13)
+      at Interface.emit (node:events:517:28)
+      at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1132:18)
+      at ReadStream.onkeypress (node:internal/readline/interface:271:20)
+      at ReadStream.emit (node:events:517:28)
+      at emitKeys (node:internal/readline/utils:371:14)
+      at emitKeys.next (<anonymous>)
+      at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+      at ReadStream.emit (node:events:517:28)
+      at addChunk (node:internal/streams/readable:368:12)
 
 npm manifest: 
   {
-    "name": "@cryptoalgebra/router-3",
-    "version": "1.0.2",
+    "name": "@cryptoalgebra/router-holesky",
     "description": "Router",
     "main": "dist/evm.js",
     "module": "dist/evm.mjs",
     "types": "dist/evm/index.d.ts",
     "sideEffects": false,
+    "publishConfig": {
+      "access": "public"
+    },
     "scripts": {
       "build": "tsup",
       "dev": "tsup --watch",
@@ -50,7 +52,6 @@ npm manifest:
       "@pancakeswap/sdk": "5.7.6",
       "@pancakeswap/swap-sdk-core": "1.0.0",
       "@pancakeswap/token-lists": "0.0.9",
-      "@pancakeswap/utils": "3.5.0",
       "@pancakeswap/v3-sdk": "3.7.9",
       "@types/node": "^20.11.17",
       "async-retry": "^1.3.1",
@@ -83,7 +84,8 @@ npm manifest:
         "import": "./dist/evm.mjs",
         "require": "./dist/evm.js"
       }
-    }
+    },
+    "version": "1.0.5"
   }
 
 yarn manifest: 
@@ -524,18 +526,6 @@ Lockfile:
     version "0.4.1"
     resolved "https://registry.yarnpkg.com/@pancakeswap/chains/-/chains-0.4.1.tgz#f8dacc6cf7c8f7e8f05665ca0e9b7ff17620212e"
     integrity sha512-b7O/oOqtwIkQj1FxGTKbJ1qH7COgD/rkV7JfSpxxIVcH5DZHPhj/P+IdpnlY0hVC1/BHEcvLnjGlSpaywLEOrQ==
-  
-  "@pancakeswap/chains@file:./evm/chains":
-    version "0.4.2"
-  
-  "@pancakeswap/multicall@3.4.1":
-    version "3.4.1"
-    resolved "https://registry.yarnpkg.com/@pancakeswap/multicall/-/multicall-3.4.1.tgz#03084ca1331536eaa5f2750d0ebe7797612f17dd"
-    integrity sha512-31WpXMkXcf3/DiMpeeisOqg0iAqsDBUFFpezsKsaeXjj/Un/OWKyIlCinjXqhmI5P/eTLas0BU4hEs2z+1GJqA==
-    dependencies:
-      "@pancakeswap/chains" "0.4.1"
-      "@pancakeswap/sdk" "5.7.6"
-      viem "1.19.11"
   
   "@pancakeswap/sdk@5.7.6":
     version "5.7.6"

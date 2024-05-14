@@ -452,30 +452,6 @@ export const swapRouter02Abi = [
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "amountIn",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "path",
-        "type": "address[]"
-      }
-    ],
-    "name": "getAmountsOut",
-    "outputs": [
-      {
-        "internalType": "uint256[]",
-        "name": "amounts",
-        "type": "uint256[]"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "token",
         "type": "address"
@@ -556,11 +532,6 @@ export const swapRouter02Abi = [
             "internalType": "address",
             "name": "token1",
             "type": "address"
-          },
-          {
-            "internalType": "uint24",
-            "name": "fee",
-            "type": "uint24"
           },
           {
             "internalType": "int24",
@@ -713,35 +684,6 @@ export const swapRouter02Abi = [
     "name": "pull",
     "outputs": [],
     "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "amountA",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "reserveA",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "reserveB",
-        "type": "uint256"
-      }
-    ],
-    "name": "quote",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "amountB",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "pure",
     "type": "function"
   },
   {
@@ -907,29 +849,6 @@ export const swapRouter02Abi = [
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "amountOutMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "path",
-        "type": "address[]"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      }
-    ],
-    "name": "swapExactETHForTokensSupportingFeeOnTransferTokens",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
         "name": "amountIn",
         "type": "uint256"
       },
@@ -939,9 +858,26 @@ export const swapRouter02Abi = [
         "type": "uint256"
       },
       {
-        "internalType": "address[]",
-        "name": "path",
-        "type": "address[]"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "from",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "to",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "stable",
+            "type": "bool"
+          }
+        ],
+        "internalType": "struct IV2SwapRouter.Route[]",
+        "name": "routes",
+        "type": "tuple[]"
       },
       {
         "internalType": "address",
@@ -949,36 +885,14 @@ export const swapRouter02Abi = [
         "type": "address"
       }
     ],
-    "name": "swapExactTokensForETHSupportingFeeOnTransferTokens",
-    "outputs": [],
-    "stateMutability": "payable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "name": "swapExactTokensForTokens",
+    "outputs": [
       {
         "internalType": "uint256",
-        "name": "amountIn",
+        "name": "amountOut",
         "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "amountOutMin",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "path",
-        "type": "address[]"
-      },
-      {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
       }
     ],
-    "name": "swapExactTokensForTokensSupportingFeeOnTransferTokens",
-    "outputs": [],
     "stateMutability": "payable",
     "type": "function"
   },

@@ -388,26 +388,7 @@ export const createMixedRouteOnChainQuoteProvider = onChainQuoteProviderFactory(
   getQuoteFunctionName: () => 'quoteExactInput',
   abi: mixedRouteQuoterV1ABI,
   getCallInputs: (route, isExactIn) => [
-    encodeMixedRouteToPath(route, !isExactIn),
-    // route.pools
-    //   .map((pool) => {
-    //     if (isV3Pool(pool)) {
-    //       return 0
-    //     }
-    //     if (isV2Pool(pool)) {
-    //       return 1
-    //     }
-    //     if (isStablePool(pool)) {
-    //       if (pool.balances.length === 2) {
-    //         return 2
-    //       }
-    //       if (pool.balances.length === 3) {
-    //         return 3
-    //       }
-    //     }
-    //     return -1
-    //   })
-    //   .filter((index) => index >= 0),
+    encodeMixedRouteToPath(route, !isExactIn, false),
     `0x${route.amount.quotient.toString(16)}`,
   ],
 })
@@ -417,7 +398,7 @@ export const createV3OnChainQuoteProvider = onChainQuoteProviderFactory({
   getQuoteFunctionName: (isExactIn) => (isExactIn ? 'quoteExactInput' : 'quoteExactOutput'),
   abi: algebraQuoterABI,
   getCallInputs: (route, isExactIn) => [
-    encodeMixedRouteToPath(route, !isExactIn),
+    encodeMixedRouteToPath(route, !isExactIn, true),
     `0x${route.amount.quotient.toString(16)}`,
   ],
 })

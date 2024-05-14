@@ -1,9 +1,10 @@
-import { CurrencyAmount, Currency, ERC20Token, Native, TradeType, Percent } from '@pancakeswap/sdk'
+import { CurrencyAmount, Currency, ERC20Token, TradeType, Percent } from '@pancakeswap/sdk'
 import { ChainId } from '../../chains/src'
 import { Address } from 'viem'
 import { ADDRESS_ZERO } from '@pancakeswap/v3-sdk'
 import { Pool, PoolType, Route, SmartRouterTrade, StablePool, V2Pool, V3Pool } from '../types'
 import { isStablePool, isV2Pool, isV3Pool } from './pool'
+import { Native } from '@cryptoalgebra/integral-sdk'
 
 const ONE_HUNDRED = BigInt(100)
 
@@ -129,7 +130,8 @@ export function serializeTrade(trade: SmartRouterTrade<TradeType>): SerializedTr
 
 export function parseCurrency(chainId: ChainId, currency: SerializedCurrency): Currency {
   if (currency.address === ADDRESS_ZERO) {
-    return Native.onChain(chainId)
+    //@ts-ignore
+    return Native.onChain(chainId, 'ETH', 'ETH')
   }
   const { address, decimals, symbol } = currency
   return new ERC20Token(chainId, address, decimals, symbol)

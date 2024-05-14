@@ -20,7 +20,22 @@ export abstract class PaymentsExtended {
   public static encodeUnwrapWETH9(amountMinimum: bigint, recipient?: Address, feeOptions?: FeeOptions): Hex {
     // if there's a recipient, just pass it along
     if (typeof recipient === 'string') {
-      return Payments.encodeUnwrapWETH9(amountMinimum, recipient, feeOptions)
+
+      recipient = validateAndParseAddress(recipient)
+
+      if (feeOptions) {
+        const feeBips = encodeFeeBips(feeOptions.fee)
+        const feeRecipient = validateAndParseAddress(feeOptions.recipient)
+  
+        return encodeFunctionData({
+          abi: PaymentsExtended.ABI,
+          functionName: 'unwrapWNativeTokenWithFee',
+          args: [amountMinimum, recipient, feeBips, feeRecipient],
+        })
+      }
+  
+      return encodeFunctionData({ abi: PaymentsExtended.ABI, functionName: 'unwrapWNativeToken', args: [amountMinimum, recipient] })
+
     }
 
     // eslint-disable-next-line no-extra-boolean-cast
@@ -30,14 +45,14 @@ export abstract class PaymentsExtended {
 
       return encodeFunctionData({
         abi: PaymentsExtended.ABI,
-        functionName: 'unwrapWETH9WithFee',
+        functionName: 'unwrapWNativeTokenWithFee',
         args: [amountMinimum, feeBips, feeRecipient],
       })
     }
 
     return encodeFunctionData({
       abi: PaymentsExtended.ABI,
-      functionName: 'unwrapWETH9',
+      functionName: 'unwrapWNativeToken',
       args: [amountMinimum],
     })
   }

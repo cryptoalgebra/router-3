@@ -157,6 +157,11 @@ export const mixedRouteQuoterV1ABI = [
             "internalType": "uint256",
             "name": "amountIn",
             "type": "uint256"
+          },
+          {
+            "internalType": "bool",
+            "name": "stable",
+            "type": "bool"
           }
         ],
         "internalType": "struct IMixedRouteQuoterV1.QuoteExactInputSingleV2Params",

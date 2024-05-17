@@ -9,7 +9,7 @@
     "access": "public"
   },
   "scripts": {
-    "build": "tsup",
+    "build": "tsup --dts",
     "dev": "tsup --watch",
     "test": "vitest --run",
     "update:snapshot": "vitest -u",
@@ -41,7 +41,8 @@
     "@types/debug": "^4.1.7",
     "@types/lodash": "^4.14.178",
     "@types/stats-lite": "^2.2.0",
-    "tsup": "^6.7.0"
+    "tsup": "^6.7.0",
+    "typescript": "^5.4.5"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -56,5 +57,5 @@
       "require": "./dist/evm.js"
     }
   },
-  "version": "1.1.0"
+  "version": "1.1.1"
 }

@@ -76,19 +76,19 @@ export abstract class PaymentsExtended {
       return encodeFunctionData({
         abi: PaymentsExtended.ABI,
         functionName: 'sweepTokenWithFee',
-        args: [token.address, amountMinimum, feeBips, feeRecipient],
+        args: [token.address as Address, amountMinimum, feeBips, feeRecipient],
       })
     }
 
     return encodeFunctionData({
       abi: PaymentsExtended.ABI,
       functionName: 'sweepToken',
-      args: [token.address, amountMinimum],
+      args: [token.address as Address, amountMinimum],
     })
   }
 
   public static encodePull(token: Token, amount: bigint): Hex {
-    return encodeFunctionData({ abi: PaymentsExtended.ABI, functionName: 'pull', args: [token.address, amount] })
+    return encodeFunctionData({ abi: PaymentsExtended.ABI, functionName: 'pull', args: [token.address as Address, amount] })
   }
 
   public static encodeWrapETH(amount: bigint): Hex {

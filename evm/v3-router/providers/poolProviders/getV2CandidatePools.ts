@@ -88,7 +88,7 @@ export const getV2PoolsWithTvlByCommonTokenPrices = createV2PoolsProviderByCommo
   v3SubgraphProvider?: SubgraphProvider
 }>(defaultGetCommonTokenPrices)
 
-type GetV2Pools<T = any> = (params: GetV2PoolsParams & T) => Promise<V2PoolWithTvl[]>
+type GetV2Pools<T = any> = (params: GetV2PoolsParams & T) => Promise<(V2PoolWithTvl | StablePoolWithTvl)[]>
 
 export function createGetV2CandidatePools<T = any>(
   defaultGetV2Pools: GetV2Pools<T>,

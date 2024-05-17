@@ -19,13 +19,9 @@ export interface V2Pool extends BasePool {
 }
 
 export interface StablePool extends BasePool {
-  address: Address
   type: PoolType.STABLE
-  // Could be 2 token pool or more
-  balances: CurrencyAmount<Currency>[]
-  amplifier: bigint
-  // Swap fee
-  fee: Percent
+  reserve0: CurrencyAmount<Currency>
+  reserve1: CurrencyAmount<Currency>
 }
 
 export interface V3Pool extends BasePool {

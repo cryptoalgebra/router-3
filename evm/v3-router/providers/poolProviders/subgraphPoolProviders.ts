@@ -193,7 +193,12 @@ export const getV2PoolSubgraph = subgraphPoolProviderFactory<PoolMeta, V2PoolWit
     {
       currencyA,
       currencyB,
-      address: computeV2PoolAddress(currencyA.wrapped, currencyB.wrapped),
+      address: computeV2PoolAddress(currencyA.wrapped, currencyB.wrapped, false),
+    },
+    {
+      currencyA,
+      currencyB,
+      address: computeV2PoolAddress(currencyA.wrapped, currencyB.wrapped, true),
     },
   ],
   getPoolsFromSubgraph: async ({ addresses, getPoolMetaByAddress, client }) => {

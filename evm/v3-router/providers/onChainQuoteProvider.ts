@@ -18,7 +18,7 @@ import {
   RouteWithQuote,
   RouteWithoutQuote,
 } from '../types'
-import { encodeMixedRouteToPath, getQuoteCurrency, isStablePool, isV2Pool, isV3Pool } from '../utils'
+import { encodeMixedRouteToPath, getQuoteCurrency } from '../utils'
 import { Result } from './multicallProvider'
 import { PancakeMulticallProvider } from './multicallSwapProvider'
 

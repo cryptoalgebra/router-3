@@ -50,9 +50,8 @@ const zV3Pool = z
 const zStablePool = z
   .object({
     type: zPoolType,
-    balances: z.array(zCurrencyAmount),
-    amplifier: zBigNumber,
-    fee: z.string(),
+    reserve0: zCurrencyAmount,
+    reserve1: zCurrencyAmount,
   })
   .required()
 

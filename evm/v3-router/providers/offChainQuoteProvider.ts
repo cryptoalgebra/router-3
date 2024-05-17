@@ -11,13 +11,11 @@ import {
   V2Pool,
   V3Pool as IV3Pool,
 } from '../types'
-import * as StableSwap from '../../stableSwap'
-import { computePairAddress, getOutputCurrency, isStablePool, isV2Pool, isV3Pool } from '../utils'
+import { computePairAddress, isStablePool, isV2Pool, isV3Pool } from '../utils'
 
 export function createOffChainQuoteProvider(): QuoteProvider {
   const createGetRoutesWithQuotes = (isExactIn = true) => {
     const getV2Quote = createGetV2Quote(isExactIn)
-    const getStableQuote = createGetStableQuote(isExactIn)
     const getV3Quote = createGetV3Quote(isExactIn)
     function* each(pools: IPool[]) {
       let i = isExactIn ? 0 : pools.length - 1
@@ -50,12 +48,8 @@ export function createOffChainQuoteProvider(): QuoteProvider {
           const initializedTickCrossedList = Array(pools.length).fill(0)
           let quoteSuccess = true
           for (const [pool, i] of each(pools)) {
-            if (isV2Pool(pool)) {
-              quote = getV2Quote(pool, quote)
-              continue
-            }
-            if (isStablePool(pool)) {
-              quote = getStableQuote(pool, quote)
+            if (isV2Pool(pool) || isStablePool(pool)) {
+              quote = getV2Quote(pool, quote, isStablePool(pool))
               continue
             }
             if (isV3Pool(pool)) {
@@ -107,27 +101,15 @@ export function createOffChainQuoteProvider(): QuoteProvider {
 
 function createGetV2Quote(isExactIn = true) {
   return function getV2Quote(
-    { reserve0, reserve1 }: V2Pool,
+    { reserve0, reserve1 }: V2Pool | StablePool,
     amount: CurrencyAmount<Currency>,
+    isStable: boolean
   ): CurrencyAmount<Currency> {
-    Pair.getAddress = computePairAddress
+    //@ts-ignore
+    Pair.getAddress = computePairAddress.bind(Pair, reserve0.wrapped.currency, reserve1.wrapped.currency, isStable);
     const pair = new Pair(reserve0.wrapped, reserve1.wrapped)
     const [quote] = isExactIn ? pair.getOutputAmount(amount.wrapped) : pair.getInputAmount(amount.wrapped)
     return quote
-  }
-}
-
-function createGetStableQuote(isExactIn = true) {
-  const getQuote = isExactIn ? StableSwap.getSwapOutput : StableSwap.getSwapInput
-  return function getStableQuote(pool: StablePool, amount: CurrencyAmount<Currency>): CurrencyAmount<Currency> {
-    const { amplifier, balances, fee } = pool
-    return getQuote({
-      amount,
-      balances,
-      amplifier,
-      outputCurrency: getOutputCurrency(pool, amount.currency),
-      fee,
-    })
   }
 }
 

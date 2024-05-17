@@ -282,10 +282,7 @@ export abstract class SwapRouter {
         return r.pools.every(isV3Pool)
       }
       const mixedRouteIsAllV2 = (r: Omit<BaseRoute, 'input' | 'output'>) => {
-        return r.pools.every(isV2Pool)
-      }
-      const mixedRouteIsAllStable = (r: Omit<BaseRoute, 'input' | 'output'>) => {
-        return r.pools.every(isStablePool)
+        return r.pools.every(isV2Pool) || r.pools.every(isStablePool)
       }
 
       if (singleHop) {
@@ -564,15 +561,11 @@ export abstract class SwapRouter {
       minimumAmountOut: minAmountOut,
     } = SwapRouter.encodeSwaps(trades, options)
 
-    console.log('swapCallParameters 1', calldatas)
-
     // unwrap or sweep
     if (routerMustCustody) {
       if (outputIsNative) {
-        console.log('swapCallParameters 2')
         calldatas.push(PaymentsExtended.encodeUnwrapWETH9(minAmountOut.quotient, options.recipient, options.fee))
       } else {
-        console.log('swapCallParameters 3')
         calldatas.push(
           PaymentsExtended.encodeSweepToken(
             sampleTrade.outputAmount.currency.wrapped,
@@ -587,11 +580,8 @@ export abstract class SwapRouter {
     // must refund when paying in ETH: either with an uncertain input amount OR if there's a chance of a partial fill.
     // unlike ERC20's, the full ETH value must be sent in the transaction, so the rest must be refunded.
     if (inputIsNative && (sampleTrade.tradeType === TradeType.EXACT_OUTPUT || SwapRouter.riskOfPartialFill(trades))) {
-      console.log('swapCallParameters 4')
       calldatas.push(encodeFunctionData({ abi: PaymentsExtended.ABI, functionName: 'refundNativeToken' }))
     }
-
-    console.log('swapCallParameters 5', calldatas)
 
     return {
       calldata: MulticallExtended.encodeMulticall(calldatas, options.deadlineOrPreviousBlockhash),

@@ -3,7 +3,6 @@ import { BigintIsh, Currency } from '@pancakeswap/sdk'
 import { OnChainProvider, Pool, PoolType, SubgraphProvider } from '../../types'
 import { getV2CandidatePools } from './getV2CandidatePools'
 import { getV3CandidatePools } from './getV3CandidatePools'
-import { getStableCandidatePools } from './getStableCandidatePools'
 
 export type GetCandidatePoolsParams = {
   currencyA?: Currency
@@ -33,13 +32,12 @@ export async function getCandidatePools({
 
   const poolSets = await Promise.all(
     protocols.map((protocol) => {
-      if (protocol === PoolType.V2) {
+      if (protocol === PoolType.V2 || protocol === PoolType.STABLE) {
         return getV2CandidatePools({ ...rest, v2SubgraphProvider, v3SubgraphProvider })
       }
       if (protocol === PoolType.V3) {
         return getV3CandidatePools({ ...rest, subgraphProvider: v3SubgraphProvider })
       }
-      return getStableCandidatePools(rest)
     }),
   )
 

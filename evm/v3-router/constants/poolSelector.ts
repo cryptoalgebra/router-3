@@ -1,7 +1,7 @@
 import { ChainId } from '../../chains/src'
 
 import { PoolSelectorConfig, PoolSelectorConfigChainMap, TokenPoolSelectorConfigChainMap } from '../types'
-import { holeskyTokens } from '../../constants/holeskyTokens'
+import { xLayerTestnetTokens } from '../../constants/tokens'
 
 export const DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfig = {
   topN: 2,
@@ -13,7 +13,7 @@ export const DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfig = {
 }
 
 export const V3_DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfigChainMap = {
-  [ChainId.HOLESKY]: {
+  [ChainId.XLAYER_TESTNET]: {
     topN: 2,
     topNDirectSwaps: 2,
     topNTokenInOut: 2,
@@ -24,7 +24,7 @@ export const V3_DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfigChainMap = {
 }
 
 export const V2_DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfigChainMap = {
-  [ChainId.HOLESKY]: {
+  [ChainId.XLAYER_TESTNET]: {
     topN: 3,
     topNDirectSwaps: 2,
     topNTokenInOut: 2,
@@ -37,11 +37,11 @@ export const V2_DEFAULT_POOL_SELECTOR_CONFIG: PoolSelectorConfigChainMap = {
 // Use to configure pool selector config when getting quote from specific tokens
 // Allow to increase or decrese the number of candidate pools to calculate routes from
 export const V3_TOKEN_POOL_SELECTOR_CONFIG: TokenPoolSelectorConfigChainMap = {
-  [ChainId.HOLESKY]: {
-    [holeskyTokens.usdt.address]: {
+  [ChainId.XLAYER_TESTNET]: {
+    [xLayerTestnetTokens.usdt.address]: {
       topNTokenInOut: 4,
     },
-    [holeskyTokens.weth.address]: {
+    [xLayerTestnetTokens.weth.address]: {
       topNTokenInOut: 4,
     }
   },

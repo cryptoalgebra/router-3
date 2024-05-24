@@ -18,7 +18,7 @@ import { buildBaseRoute } from './route'
 import { getOutputOfPools } from './getOutputOfPools'
 import { getPriceImpact } from './getPriceImpact'
 import { ADDRESS_ZERO } from '@cryptoalgebra/integral-sdk'
-import { holeskyTokens } from '../../constants/holeskyTokens'
+import { xLayerTestnetTokens } from '../../constants/tokens'
 
 const ZERO = BigInt(0)
 const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
@@ -627,8 +627,8 @@ export abstract class SwapRouter {
     const { positionAmountIn, positionAmountOut } = SwapRouter.getPositionAmounts(position, zeroForOne)
 
     // if tokens are native they will be converted to WETH9
-    const tokenIn = inputIsNative ? holeskyTokens.weth : positionAmountIn.currency.wrapped
-    const tokenOut = outputIsNative ? holeskyTokens.weth : positionAmountOut.currency.wrapped
+    const tokenIn = inputIsNative ? xLayerTestnetTokens.wokb : positionAmountIn.currency.wrapped
+    const tokenOut = outputIsNative ? xLayerTestnetTokens.wokb : positionAmountOut.currency.wrapped
 
     // if swap output does not make up whole outputTokenBalanceDesired, pull in remaining tokens for adding liquidity
     const amountOutRemaining = positionAmountOut.subtract(quoteAmountOut.wrapped)

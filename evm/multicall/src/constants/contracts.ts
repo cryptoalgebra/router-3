@@ -2,11 +2,11 @@ import { ChainId } from '../../../chains/src'
 import { Address } from 'viem'
 
 export const MULTICALL_ADDRESS: { [key in ChainId]?: Address } = {
-  [ChainId.HOLESKY]: '0x4c4849b3aef966e5e39b4abf27767eada487eaa4'
+  [ChainId.XLAYER_TESTNET]: '0x6207dc4f7f0632d8e90034be5e04dfa3a731b564'
 }
 
 export const MULTICALL3_ADDRESSES: {
   [key in ChainId]?: Address
 } = {
-  [ChainId.HOLESKY]: '0xf7ca7d0f8bbef9bbfeb66cf2c9c84eeb2da60b22'
+  [ChainId.XLAYER_TESTNET]: '0x6207dc4f7f0632d8e90034be5e04dfa3a731b564'
 }

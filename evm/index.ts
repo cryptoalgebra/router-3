@@ -1,4 +1,4 @@
-export { CurrencyAmount, Percent, Native } from '@pancakeswap/sdk'
+export { type Currency, CurrencyAmount, Percent, Native } from '@pancakeswap/sdk'
 export * from './constants'
 export * from './constants/stableSwap'
 export * as StableSwap from './stableSwap'

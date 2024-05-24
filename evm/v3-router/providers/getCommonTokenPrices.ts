@@ -11,7 +11,7 @@ const tokenPriceQuery = gql`
   query getTokens($pageSize: Int!, $tokenAddrs: [ID!]) {
     tokens(first: $pageSize, where: { id_in: $tokenAddrs }) {
       id
-      derivedUSD: derivedMatic
+      derivedUSD: derivedOKB
     }
   }
 `

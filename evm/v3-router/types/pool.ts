@@ -1,5 +1,5 @@
 import { Currency, CurrencyAmount, Percent } from '@pancakeswap/sdk'
-import { FeeAmount, Tick } from '@pancakeswap/v3-sdk'
+import { Tick } from '@pancakeswap/v3-sdk'
 import { Address } from 'viem'
 
 export enum PoolType {
@@ -29,7 +29,7 @@ export interface V3Pool extends BasePool {
   token0: Currency
   token1: Currency
   // Different fee tier
-  fee: FeeAmount
+  fee: number
   liquidity: bigint
   sqrtRatioX96: bigint
   tick: number

@@ -1,10 +1,11 @@
 import { ChainId } from '../../chains/src'
 import { Token } from '@pancakeswap/sdk'
 
-import { holeskyTokens } from '../holeskyTokens'
+import { xLayerTestnetTokens } from '../tokens'
 
 export const usdGasTokensByChain = {
-  [ChainId.HOLESKY]: [holeskyTokens.usdt]
+  [ChainId.XLAYER_TESTNET]: [xLayerTestnetTokens.usdt],
+  [ChainId.XLAYER]: []
 } satisfies Record<ChainId, Token[]>
 
 export * from './stableSwap'

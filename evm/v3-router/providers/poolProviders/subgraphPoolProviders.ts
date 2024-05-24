@@ -1,8 +1,8 @@
 import { ChainId } from '../../../chains/src'
 import { Currency, Token } from '@pancakeswap/sdk'
 import tryParseAmount from '../../../utils/tryParseAmount'
-import { FeeAmount, Pool, parseProtocolFees } from '@pancakeswap/v3-sdk'
-import { POOL_DEPLOYER_ADDRESSES, computePoolAddress } from '@cryptoalgebra/integral-sdk'
+import { parseProtocolFees } from '@pancakeswap/v3-sdk'
+import { computePoolAddress } from '@cryptoalgebra/integral-sdk'
 import type { GraphQLClient } from 'graphql-request'
 import { gql } from 'graphql-request'
 import memoize from 'lodash/memoize.js'
@@ -76,7 +76,7 @@ function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
 }
 
 const getV3PoolMeta = memoize(
-  ([currencyA, currencyB, feeAmount]: [Currency, Currency, FeeAmount]) => ({
+  ([currencyA, currencyB, feeAmount]: [Currency, Currency, number]) => ({
     address: computePoolAddress({tokenA: currencyA.wrapped,
       tokenB: currencyB.wrapped,
       poolDeployer: ALGEBRA_POOL_DEPLOYER,
@@ -98,7 +98,7 @@ const getV3PoolMeta = memoize(
 
 const getV3PoolMetas = memoize(
   (pair: [Currency, Currency]) =>
-    [FeeAmount.LOWEST].map((fee) => getV3PoolMeta([...pair, fee])),
+    [100].map((fee) => getV3PoolMeta([...pair, fee])),
   ([currencyA, currencyB]) => {
     if (currencyA.wrapped.equals(currencyB.wrapped)) {
       return [currencyA.chainId, currencyA.wrapped.address].join('_')
@@ -115,17 +115,17 @@ interface V3PoolSubgraphResult {
   liquidity: string
   sqrtPrice: string
   tick: string
-  feeTier: string
+  fee: string
   totalValueLockedUSD: string
 }
 
 const queryV3Pools = gql`
   query getPools($pageSize: Int!, $poolAddrs: [String]) {
-    pools(first: $pageSize, where: { id_in: $poolAddrs }) {
+    v3Pools(first: $pageSize, where: { id_in: $poolAddrs }) {
       id
       tick
       sqrtPrice
-      feeTier: feeZtO
+      fee
       liquidity
       totalValueLockedUSD
     }
@@ -141,20 +141,20 @@ export const getV3PoolSubgraph = subgraphPoolProviderFactory<V3PoolMeta, V3PoolW
       poolAddrs: addresses,
     })
 
-    return poolsFromSubgraph.map(({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD }) => {
+    return poolsFromSubgraph.map(({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD, fee }) => {
       const meta = getPoolMetaByAddress(id as Address)
       if (!meta) {
         return null
       }
 
-      const { fee, currencyA, currencyB, address } = meta
+      const { currencyA, currencyB, address } = meta
       const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
         ? [currencyA, currencyB]
         : [currencyB, currencyA]
       const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0)
       return {
         type: PoolType.V3 as const,
-        fee,
+        fee: Number(fee),
         token0,
         token1,
         liquidity: BigInt(liquidity),
@@ -178,11 +178,11 @@ interface V2PoolSubgraphResult {
 
 const queryV2Pools = gql`
   query getPools($pageSize: Int!, $poolAddrs: [ID!]) {
-    pairs(first: $pageSize, where: { id_in: $poolAddrs }) {
+    v2Pools(first: $pageSize, where: { id_in: $poolAddrs }) {
       id
-      reserve0
-      reserve1
-      reserveUSD
+      reserve0: totalValueLockedToken0
+      reserve1: totalValueLockedToken1
+      reserveUSD: totalValueLockedUSD
     }
   }
 `
@@ -290,7 +290,7 @@ function subgraphAllPoolsQueryFactory<P extends WithTvl>({
 
 const queryAllV3Pools = gql`
   query getPools($pageSize: Int!, $id: String) {
-    pools(first: $pageSize, where: { id_gt: $id }) {
+    v3Pools(first: $pageSize, where: { id_gt: $id }) {
       id
       tick
       token0 {
@@ -304,7 +304,7 @@ const queryAllV3Pools = gql`
         decimals
       }
       sqrtPrice
-      feeTier: feeZtO
+      fee
       liquidity
       totalValueLockedUSD
     }
@@ -333,11 +333,11 @@ export const getAllV3PoolsFromSubgraph = subgraphAllPoolsQueryFactory<V3PoolWith
       },
     )
     return poolsFromSubgraph.map(
-      ({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD, token0, token1, feeTier }) => {
+      ({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD, token0, token1, fee }) => {
         const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0)
         return {
           type: PoolType.V3 as const,
-          fee: Number(feeTier),
+          fee: Number(fee),
           token0: new Token(chainId, getAddress(token0.id), Number(token0.decimals), token0.symbol),
           token1: new Token(chainId, getAddress(token1.id), Number(token1.decimals), token1.symbol),
           liquidity: BigInt(liquidity),

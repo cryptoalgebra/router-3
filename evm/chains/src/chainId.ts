@@ -1,7 +1,8 @@
 export enum ChainId {
-  HOLESKY = 17000
+  XLAYER_TESTNET = 195,
+  XLAYER = 196
 }
 
 export const testnetChainIds = [
-  ChainId.HOLESKY
+  ChainId.XLAYER_TESTNET
 ]

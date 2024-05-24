@@ -1,12 +1,11 @@
 import { TradeType } from '@pancakeswap/sdk'
 import { ChainId } from '../chains/src'
-import { FeeAmount } from '@pancakeswap/v3-sdk'
 import { Address } from 'viem'
 import { z } from 'zod'
 import { PoolType } from './types'
 
 const zChainId = z.nativeEnum(ChainId)
-const zFee = z.nativeEnum(FeeAmount)
+const zFee = z.number()
 const zTradeType = z.nativeEnum(TradeType)
 const zPoolType = z.nativeEnum(PoolType)
 const zPoolTypes = z.array(zPoolType)

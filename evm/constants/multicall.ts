@@ -15,5 +15,6 @@ const DEFAULT: BatchMulticallConfigs = {
 }
 
 export const BATCH_MULTICALL_CONFIGS: ChainMap<BatchMulticallConfigs> = {
-  [ChainId.HOLESKY]: DEFAULT,
+  [ChainId.XLAYER]: DEFAULT,
+  [ChainId.XLAYER_TESTNET]: DEFAULT,
 }

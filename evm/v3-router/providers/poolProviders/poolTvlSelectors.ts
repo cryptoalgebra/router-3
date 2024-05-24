@@ -6,7 +6,7 @@ import { PoolSelectorConfig, V2PoolWithTvl, V3PoolWithTvl, WithTvl } from '../..
 import { BASES_TO_CHECK_TRADES_AGAINST } from '../../../constants'
 import { getV2PoolSelectorConfig, getV3PoolSelectorConfig } from '../../utils/getPoolSelectorConfig'
 import { getPoolAddress as getPoolAddressUtil } from '../../utils'
-import { holeskyTokens } from '../../../constants/holeskyTokens'
+import { xLayerTestnetTokens } from '../../../constants/tokens'
 
 const sortByTvl = (a: WithTvl, b: WithTvl) => (a.tvlUSD >= b.tvlUSD ? -1 : 1)
 
@@ -103,7 +103,7 @@ function poolSelectorFactory<P extends WithTvl>({
 
     addToPoolSet(top2DirectPools)
 
-    const nativeToken = holeskyTokens.weth
+    const nativeToken = xLayerTestnetTokens.wokb
     const top2EthBaseTokenPool = nativeToken
       ? poolsFromSubgraph
           .filter((subgraphPool) => {

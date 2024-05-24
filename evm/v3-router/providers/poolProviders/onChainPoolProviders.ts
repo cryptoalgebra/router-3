@@ -1,7 +1,7 @@
 import { ChainId } from '../../../chains/src'
 import { BigintIsh, Currency, CurrencyAmount, Percent } from '@pancakeswap/sdk'
 import { deserializeToken } from '@pancakeswap/token-lists'
-import { FeeAmount, parseProtocolFees } from '@pancakeswap/v3-sdk'
+import { parseProtocolFees } from '@pancakeswap/v3-sdk'
 import { Abi, Address, ContractFunctionConfig } from 'viem'
 import { algebraPoolABI } from '../../../abis/AlgebraPoolABI'
 
@@ -50,7 +50,7 @@ export const getV2PoolsOnChain = createOnChainPoolFactory<V2Pool | StablePool, P
 export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3PoolMeta>({
   abi: algebraPoolABI,
   getPossiblePoolMetas: ([currencyA, currencyB]) => {
-    return [FeeAmount.LOWEST].map((fee) => ({
+    return [100].map((fee) => ({
       address: computeV3PoolAddress({
         poolDeployer: ALGEBRA_POOL_DEPLOYER,
         tokenA: currencyA.wrapped,
@@ -72,11 +72,11 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3
       functionName: 'globalState',
     },
   ],
-  buildPool: ({ currencyA, currencyB, fee, address }, [liquidity, globalState]) => {
+  buildPool: ({ currencyA, currencyB, address }, [liquidity, globalState]) => {
     if (!globalState) {
       return null
     }
-    const [sqrtPriceX96, tick] = globalState
+    const [sqrtPriceX96, tick, fee] = globalState
     const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
       ? [currencyA, currencyB]
       : [currencyB, currencyA]

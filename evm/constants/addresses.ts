@@ -25,7 +25,7 @@ export const ROUTER_V2: Address =
 
 /* Multi */
 export const SWAP_ROUTER_02: Address =
-    '0xD7c70c1879dABFC28e8FCB11214Dba7eda4741D3';
+    '0x6F40a7D8c3A5CFBF1203F896dE89fFCaC3fb79dc';
 
 export const MIXED_ROUTE_QUOTER_V1: Address =
-    '0xd9A0ffa58143CdC5C1767208dDdB64a1889D78ae'; // in use
+    '0xa35659B073FFFD5740c01238b5650a35F6E5C5F4'; // in use

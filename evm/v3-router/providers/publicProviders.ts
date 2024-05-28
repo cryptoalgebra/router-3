@@ -1,5 +1,5 @@
 import { GraphQLClient } from "graphql-request";
-import { createPublicClient, defineChain, http } from "viem";
+import { createPublicClient, defineChain, http, PublicClient } from "viem";
 import { createQuoteProvider } from "./quoteProviders";
 
 export const xLayerTestnet = defineChain({
@@ -38,7 +38,7 @@ export const publicClient = createPublicClient({
       batchSize: 1024 * 200,
     },
   },
-})
+}) as PublicClient
 
 export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,

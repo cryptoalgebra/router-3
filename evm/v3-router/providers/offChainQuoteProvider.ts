@@ -105,8 +105,9 @@ function createGetV2Quote(isExactIn = true) {
     amount: CurrencyAmount<Currency>,
     isStable: boolean
   ): CurrencyAmount<Currency> {
+    const [currencyA, currencyB] = reserve0.wrapped.currency.sortsBefore(reserve1.wrapped.currency) ? [reserve0.wrapped.currency, reserve1.wrapped.currency] : [reserve1.wrapped.currency, reserve0.wrapped.currency]
     //@ts-ignore
-    Pair.getAddress = computePairAddress.bind(Pair, reserve0.wrapped.currency, reserve1.wrapped.currency, isStable);
+    Pair.getAddress = computePairAddress.bind(Pair, currencyA, currencyB, isStable);
     const pair = new Pair(reserve0.wrapped, reserve1.wrapped)
     const [quote] = isExactIn ? pair.getOutputAmount(amount.wrapped) : pair.getInputAmount(amount.wrapped)
     return quote

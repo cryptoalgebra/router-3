@@ -7,13 +7,14 @@ import { Address, keccak256, encodePacked, getCreate2Address } from 'viem'
 import { Pool, PoolType, StablePool, V2Pool, V3Pool } from '../types'
 
 export function computePairAddress(token0: Token, token1: Token, isStable: boolean) {
+  const [_token0, _token1] = token0.sortsBefore(token1) ? [token0, token1] : [token1, token0]
   const salt = keccak256(
-    encodePacked(['address', 'address', 'bool'], [token0.address as Address, token1.address as Address, isStable])
+    encodePacked(['address', 'address', 'bool'], [_token0.address as Address, _token1.address as Address, isStable])
   )
   return getCreate2Address({
     from: '0xf532839E3B36Bac7281B4986e197127166eFD6De',
     salt,
-    bytecodeHash: '0x664a0deaa7261823d82ee0c235235765b5e53199c871313fbdcdda2667878924'
+    bytecodeHash: '0x0d0128a81f322b1beff50a2fe5e23a194fffc4f7c81736e27af97cded386e788'
   })
 }
 

@@ -7,7 +7,7 @@ import invariant from 'tiny-invariant'
 import { swapRouter02Abi } from '../../abis/algebra/ISwapRouter02'
 import { ADDRESS_THIS, MSG_SENDER } from '../../constants'
 import { ApproveAndCall, ApprovalTypes, CondensedAddLiquidityOptions } from './approveAndCall'
-import { SmartRouterTrade, V3Pool, BaseRoute, RouteType, StablePool } from '../types'
+import { SmartRouterTrade, V3Pool, BaseRoute, RouteType, StablePool, PoolType } from '../types'
 import { MulticallExtended, Validation } from './multicallExtended'
 import { PaymentsExtended } from './paymentsExtended'
 import { encodeMixedRouteToPath } from './encodeMixedRouteToPath'
@@ -104,7 +104,7 @@ export abstract class SwapRouter {
       path.push({
         from: token.wrapped.address as Address,
         to: nextToken.wrapped.address as Address,
-        stable: false
+        stable: route.pools[path.length].type === PoolType.STABLE
       })
 
     }
@@ -262,8 +262,6 @@ export abstract class SwapRouter {
 
     const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
 
-    
-
     for (const route of trade.routes) {
       const { inputAmount, outputAmount, pools } = route
       const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance, inputAmount).quotient
@@ -392,7 +390,7 @@ export abstract class SwapRouter {
               path.push({
                 from: token.wrapped.address as Address,
                 to: nextToken.wrapped.address as Address,
-                stable: false
+                stable: newRoute.pools[path.length].type === PoolType.STABLE
               })
         
             }

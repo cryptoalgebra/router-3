@@ -11,7 +11,7 @@ export function buildBaseRoute(pools: Pool[], currencyIn: Currency, currencyOut:
     if (currentRouteType === null) {
       return getRouteTypeFromPool(pool)
     }
-    if (currentRouteType === RouteType.MIXED || currentRouteType !== getRouteTypeFromPool(pool)) {
+    if (currentRouteType === RouteType.MIXED || (currentRouteType !== getRouteTypeFromPool(pool))) {
       return RouteType.MIXED
     }
     return currentRouteType
@@ -42,7 +42,7 @@ function getRouteTypeFromPool(pool: Pool) {
     case PoolType.V3:
       return RouteType.V3
     case PoolType.STABLE:
-      return RouteType.STABLE
+      return RouteType.V2
     default:
       return RouteType.MIXED
   }

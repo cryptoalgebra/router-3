@@ -22,7 +22,7 @@ export const STABLE_SWAP_INFO_ADDRESS: ChainMap<string> = {
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.XLAYER_TESTNET]: [xLayerTestnetTokens.usdt, xLayerTestnetTokens.weth, xLayerTestnetTokens.t1],
+  [ChainId.XLAYER_TESTNET]: [xLayerTestnetTokens.usdt, xLayerTestnetTokens.weth, xLayerTestnetTokens.t1, xLayerTestnetTokens.tt2],
   [ChainId.XLAYER]: []
 }
 

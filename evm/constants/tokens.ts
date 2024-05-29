@@ -30,4 +30,11 @@ export const xLayerTestnetTokens = {
     'T1',
     'T1',
   ),
+  tt2: new ERC20Token(
+    ChainId.XLAYER_TESTNET,
+    '0xd38b4cba041aaf2b69148a3e92c6f11db250ebe8',
+    18,
+    'TT2',
+    'TT2'
+  )
 }

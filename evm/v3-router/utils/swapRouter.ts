@@ -124,7 +124,7 @@ export abstract class SwapRouter {
           args: exactInputParams,
         })
       }
-      const exactOutputParams = [amountOut, amountIn, path, recipient] as const
+      const exactOutputParams = [amountIn, amountOut, path, recipient] as const
   
       return encodeFunctionData({
         abi: SwapRouter.ABI,
@@ -411,7 +411,7 @@ export abstract class SwapRouter {
                 }),
               )
             } else {
-              const exactOutputParams = [outAmount, inAmount, path, recipientAddress] as const
+              const exactOutputParams = [inAmount, outAmount, path, recipientAddress] as const
 
               calldatas.push(
                 encodeFunctionData({

@@ -91,6 +91,8 @@ export function getTokenPrice(pool: Pool, base: Currency, quote: Currency): Pric
   }
 
   if (isV2Pool(pool) || isStablePool(pool)) {
+    //@ts-ignore
+    Pair.getAddress = computePairAddress.bind(Pair, pool.reserve0.currency.wrapped, pool.reserve1.currency.wrapped, isStablePool(pool));
     const pair = new Pair(pool.reserve0.wrapped, pool.reserve1.wrapped)
     return pair.priceOf(base.wrapped)
   }

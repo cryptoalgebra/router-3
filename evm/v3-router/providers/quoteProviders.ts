@@ -35,7 +35,8 @@ export function createQuoteProvider(config: QuoterConfig): QuoteProvider<QuoterC
       const routesCanQuoteOffChain: RouteWithoutQuote[] = []
       for (const route of routes) {
         if (route.type === RouteType.V2 || route.type === RouteType.STABLE) {
-          routesCanQuoteOffChain.push(route)
+          // routesCanQuoteOffChain.push(route)
+          mixedRoutesHaveV3Pool.push(route)
           continue
         }
         if (route.type === RouteType.V3) {

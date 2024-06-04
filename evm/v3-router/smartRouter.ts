@@ -13,6 +13,7 @@ export {
   isStablePool,
   isV2Pool,
   isV3Pool,
+  computePairAddress,
   log,
   logger,
   maximumAmountIn,

@@ -1,5 +1,5 @@
 {
-  "name": "@cryptoalgebra/router-xlayer-testnet",
+  "name": "@cryptoalgebra/router-custom-pools",
   "description": "Router",
   "main": "dist/evm.js",
   "module": "dist/evm.mjs",
@@ -19,8 +19,7 @@
     "dist"
   ],
   "dependencies": {
-    "@cryptoalgebra/integral-sdk": "^0.11.8",
-    "@cryptoalgebra/swapx-sdk": "^1.0.1",
+    "@cryptoalgebra/custom-pools-sdk": "^1.0.5",
     "@pancakeswap/sdk": "5.7.6",
     "@pancakeswap/swap-sdk-core": "1.0.0",
     "@pancakeswap/token-lists": "0.0.9",
@@ -59,5 +58,5 @@
       "require": "./dist/evm.js"
     }
   },
-  "version": "1.0.18"
+  "version": "1.0.0"
 }

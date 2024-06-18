@@ -2,7 +2,7 @@ import { ChainId } from '../../chains/src'
 import { Address, PublicClient, getContract } from 'viem'
 
 import { iMulticallABI } from './abis/IMulticall'
-import { MULTICALL3_ADDRESSES, MULTICALL_ADDRESS } from './constants/contracts'
+import { MULTICALL3_ADDRESSES, MULTICALL_ADDRESS } from './constants'
 
 type Params = {
   chainId: ChainId
@@ -19,5 +19,5 @@ export function getMulticallContract({ chainId, client }: Params) {
 }
 
 export function getMulticall3ContractAddress(chainId?: ChainId): Address {
-  return MULTICALL3_ADDRESSES[chainId || ChainId.XLAYER_TESTNET] || '0x6207dc4f7f0632d8e90034be5e04dfa3a731b564'
+  return MULTICALL3_ADDRESSES[chainId || ChainId.HOLESKY] || '0xca11bde05977b3631167028862be2a173976ca11'
 }

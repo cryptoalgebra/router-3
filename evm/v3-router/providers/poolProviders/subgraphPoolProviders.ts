@@ -1,28 +1,43 @@
-import { ChainId } from '../../../chains/src'
-import { Currency, Token } from '@pancakeswap/sdk'
-import tryParseAmount from '../../../utils/tryParseAmount'
-import { parseProtocolFees } from '@pancakeswap/v3-sdk'
-import { computePoolAddress } from '@cryptoalgebra/integral-sdk'
-import type { GraphQLClient } from 'graphql-request'
-import { gql } from 'graphql-request'
-import memoize from 'lodash/memoize.js'
-import { Address, getAddress } from 'viem'
+import { ChainId } from "../../../chains/src";
+import { Currency, Token } from "@pancakeswap/sdk";
+import tryParseAmount from "../../../utils/tryParseAmount";
+import { parseProtocolFees } from "@pancakeswap/v3-sdk";
+import {
+  computePoolAddress,
+  computeCustomPoolAddress,
+} from "@cryptoalgebra/custom-pools-sdk";
+import type { GraphQLClient } from "graphql-request";
+import { gql } from "graphql-request";
+import memoize from "lodash/memoize.js";
+import { Address, getAddress } from "viem";
 
-import { PoolType, SubgraphProvider, V2PoolWithTvl, V3PoolWithTvl, WithTvl } from '../../types'
-import { computeV2PoolAddress, logger, metric } from '../../utils'
-import { PoolMeta, V3PoolMeta } from './internalTypes'
-import { ALGEBRA_POOL_DEPLOYER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
+import {
+  PoolType,
+  SubgraphProvider,
+  V2PoolWithTvl,
+  V3PoolWithTvl,
+  WithTvl,
+} from "../../types";
+import { computeV2PoolAddress, logger, metric } from "../../utils";
+import { PoolMeta, V3PoolMeta } from "./internalTypes";
+import {
+  ALGEBRA_POOL_DEPLOYER,
+  CUSTOM_POOL_BASE,
+  CUSTOM_POOL_DEPLOYER_BLANK,
+  CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+  POOL_INIT_CODE_HASH,
+} from "../../../constants/addresses";
 
 interface FactoryParams<M extends PoolMeta, P extends WithTvl> {
   // Function identifier
-  id: string
+  id: string;
 
-  getPoolMetas: (pair: [Currency, Currency]) => M[]
+  getPoolMetas: (pair: [Currency, Currency], deployer: Address) => M[];
   getPoolsFromSubgraph: (params: {
-    addresses: Address[]
-    getPoolMetaByAddress: (address: Address) => M | null
-    client: GraphQLClient
-  }) => Promise<(P | null)[]>
+    addresses: Address[];
+    getPoolMetaByAddress: (address: Address) => M | null;
+    client: GraphQLClient;
+  }) => Promise<(P | null)[]>;
 }
 
 function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
@@ -34,146 +49,201 @@ function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
     provider,
     pairs,
   }: {
-    provider?: SubgraphProvider
-    pairs: [Currency, Currency][]
+    provider?: SubgraphProvider;
+    pairs: [Currency, Currency][];
   }): Promise<P[]> {
     if (!provider) {
-      throw new Error('No valid subgraph data provider')
+      throw new Error("No valid subgraph data provider");
     }
-    const chainId: ChainId = pairs[0]?.[0]?.chainId
+    const chainId: ChainId = pairs[0]?.[0]?.chainId;
     if (!chainId) {
-      return []
+      return [];
     }
 
-    const client = provider({ chainId })
+    const client = provider({ chainId });
 
     if (!client) {
-      logger.error('No subgraph client found for chainId', chainId)
-      return []
+      logger.error("No subgraph client found for chainId", chainId);
+      return [];
     }
 
-    metric(`SUBGRAPH_POOLS_START(${id})`, pairs)
+    metric(`SUBGRAPH_POOLS_START(${id})`, pairs);
 
-    const metaMap = new Map<Address, M>()
+    const metaMap = new Map<Address, M>();
     for (const pair of pairs) {
-      const metas = getPoolMetas(pair)
-      for (const meta of metas) {
-        metaMap.set(meta.address.toLocaleLowerCase() as Address, meta)
+      for (const deployer of [
+        CUSTOM_POOL_BASE,
+        CUSTOM_POOL_DEPLOYER_BLANK,
+        CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+      ]) {
+        const metas = getPoolMetas(pair, deployer);
+        for (const meta of metas) {
+          metaMap.set(meta.address.toLocaleLowerCase() as Address, meta);
+        }
       }
     }
-    const addresses = Array.from(metaMap.keys())
+    const addresses = Array.from(metaMap.keys());
 
     const pools = await getPoolsFromSubgraph({
       addresses,
-      getPoolMetaByAddress: (address) => metaMap.get(address.toLocaleLowerCase() as Address) ?? null,
+      getPoolMetaByAddress: (address) =>
+        metaMap.get(address.toLocaleLowerCase() as Address) ?? null,
       client,
-    })
+    });
 
-    metric(`SUBGRAPH_POOLS_END(${id})`, pools)
+    metric(`SUBGRAPH_POOLS_END(${id})`, pools);
 
-    return pools.filter<P>((p): p is P => !!p)
-  }
+    return pools.filter<P>((p): p is P => !!p);
+  };
 }
 
 const getV3PoolMeta = memoize(
-  ([currencyA, currencyB, feeAmount]: [Currency, Currency, number]) => ({
-    address: computePoolAddress({tokenA: currencyA.wrapped,
-      tokenB: currencyB.wrapped,
-      poolDeployer: ALGEBRA_POOL_DEPLOYER,
-      initCodeHashManualOverride: POOL_INIT_CODE_HASH}) as Address,
+  ([currencyA, currencyB, deployer, feeAmount]: [
+    Currency,
+    Currency,
+    Address,
+    number
+  ]) => ({
+    address: (deployer === CUSTOM_POOL_BASE
+      ? computePoolAddress({
+          tokenA: currencyA.wrapped,
+          tokenB: currencyB.wrapped,
+          poolDeployer: ALGEBRA_POOL_DEPLOYER,
+          initCodeHashManualOverride: POOL_INIT_CODE_HASH,
+        })
+      : computeCustomPoolAddress({
+          tokenA: currencyA.wrapped,
+          tokenB: currencyB.wrapped,
+          customPoolDeployer: deployer,
+          mainPoolDeployer: ALGEBRA_POOL_DEPLOYER,
+          initCodeHashManualOverride: POOL_INIT_CODE_HASH,
+        })) as Address,
     currencyA,
     currencyB,
     fee: feeAmount,
+    deployer,
   }),
-  ([currencyA, currencyB, feeAmount]) => {
+  ([currencyA, currencyB, deployer, feeAmount]) => {
     if (currencyA.wrapped.equals(currencyB.wrapped)) {
-      return [currencyA.chainId, currencyA.wrapped.address, feeAmount].join('_')
+      return [
+        currencyA.chainId,
+        currencyA.wrapped.address,
+        deployer,
+        feeAmount,
+      ].join("_");
     }
     const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
       ? [currencyA.wrapped, currencyB.wrapped]
-      : [currencyB.wrapped, currencyA.wrapped]
-    return [token0.chainId, token0.address, token1.address, feeAmount].join('_')
-  },
-)
+      : [currencyB.wrapped, currencyA.wrapped];
+    return [
+      token0.chainId,
+      token0.address,
+      token1.address,
+      deployer,
+      feeAmount,
+    ].join("_");
+  }
+);
 
 const getV3PoolMetas = memoize(
-  (pair: [Currency, Currency]) =>
-    [100].map((fee) => getV3PoolMeta([...pair, fee])),
-  ([currencyA, currencyB]) => {
+  (pair: [Currency, Currency], deployer: Address) => [
+    getV3PoolMeta([...pair, deployer, 100]),
+  ],
+  ([currencyA, currencyB], deployer) => {
     if (currencyA.wrapped.equals(currencyB.wrapped)) {
-      return [currencyA.chainId, currencyA.wrapped.address].join('_')
+      return [currencyA.chainId, currencyA.wrapped.address].join("_");
     }
     const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
       ? [currencyA.wrapped, currencyB.wrapped]
-      : [currencyB.wrapped, currencyA.wrapped]
-    return [token0.chainId, token0.address, token1.address].join('_')
-  },
-)
+      : [currencyB.wrapped, currencyA.wrapped];
+    return [token0.chainId, token0.address, token1.address, deployer].join("_");
+  }
+);
 
 interface V3PoolSubgraphResult {
-  id: string
-  liquidity: string
-  sqrtPrice: string
-  tick: string
-  fee: string
-  totalValueLockedUSD: string
+  id: string;
+  liquidity: string;
+  sqrtPrice: string;
+  tick: string;
+  fee: string;
+  totalValueLockedUSD: string;
+  deployer: string;
 }
 
 const queryV3Pools = gql`
   query getPools($pageSize: Int!, $poolAddrs: [String]) {
-    v3Pools(first: $pageSize, where: { id_in: $poolAddrs }) {
+    pools(first: $pageSize, where: { id_in: $poolAddrs }) {
       id
       tick
       sqrtPrice
       fee
       liquidity
       totalValueLockedUSD
+      deployer
     }
   }
-`
+`;
 
-export const getV3PoolSubgraph = subgraphPoolProviderFactory<V3PoolMeta, V3PoolWithTvl>({
-  id: 'V3',
+export const getV3PoolSubgraph = subgraphPoolProviderFactory<
+  V3PoolMeta,
+  V3PoolWithTvl
+>({
+  id: "V3",
   getPoolMetas: getV3PoolMetas,
   getPoolsFromSubgraph: async ({ addresses, getPoolMetaByAddress, client }) => {
-    const { pools: poolsFromSubgraph } = await client.request<{ pools: V3PoolSubgraphResult[] }>(queryV3Pools, {
+    const { pools: poolsFromSubgraph } = await client.request<{
+      pools: V3PoolSubgraphResult[];
+    }>(queryV3Pools, {
       pageSize: 1000,
       poolAddrs: addresses,
-    })
+    });
 
-    return poolsFromSubgraph.map(({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD, fee }) => {
-      const meta = getPoolMetaByAddress(id as Address)
-      if (!meta) {
-        return null
-      }
+    return poolsFromSubgraph.map(
+      ({
+        id,
+        liquidity,
+        sqrtPrice,
+        tick,
+        totalValueLockedUSD,
+        fee,
+        deployer,
+      }) => {
+        const meta = getPoolMetaByAddress(id as Address);
+        if (!meta) {
+          return null;
+        }
 
-      const { currencyA, currencyB, address } = meta
-      const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
-        ? [currencyA, currencyB]
-        : [currencyB, currencyA]
-      const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0)
-      return {
-        type: PoolType.V3 as const,
-        fee: Number(fee),
-        token0,
-        token1,
-        liquidity: BigInt(liquidity),
-        sqrtRatioX96: BigInt(sqrtPrice),
-        tick: Number(tick),
-        address,
-        tvlUSD: BigInt(Number.parseInt(totalValueLockedUSD)),
-        token0ProtocolFee,
-        token1ProtocolFee,
+        const { currencyA, currencyB, address } = meta;
+        const [token0, token1] = currencyA.wrapped.sortsBefore(
+          currencyB.wrapped
+        )
+          ? [currencyA, currencyB]
+          : [currencyB, currencyA];
+        const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0);
+        return {
+          type: PoolType.V3 as const,
+          fee: Number(fee),
+          token0,
+          token1,
+          liquidity: BigInt(liquidity),
+          sqrtRatioX96: BigInt(sqrtPrice),
+          tick: Number(tick),
+          address,
+          tvlUSD: BigInt(Number.parseInt(totalValueLockedUSD)),
+          token0ProtocolFee,
+          token1ProtocolFee,
+          deployer: deployer as Address,
+        };
       }
-    })
+    );
   },
-})
+});
 
 interface V2PoolSubgraphResult {
-  id: string
-  reserveUSD: string
-  reserve0: string
-  reserve1: string
+  id: string;
+  reserveUSD: string;
+  reserve0: string;
+  reserve1: string;
 }
 
 const queryV2Pools = gql`
@@ -185,15 +255,22 @@ const queryV2Pools = gql`
       reserveUSD: totalValueLockedUSD
     }
   }
-`
+`;
 
-export const getV2PoolSubgraph = subgraphPoolProviderFactory<PoolMeta, V2PoolWithTvl>({
-  id: 'V2',
+export const getV2PoolSubgraph = subgraphPoolProviderFactory<
+  PoolMeta,
+  V2PoolWithTvl
+>({
+  id: "V2",
   getPoolMetas: ([currencyA, currencyB]) => [
     {
       currencyA,
       currencyB,
-      address: computeV2PoolAddress(currencyA.wrapped, currencyB.wrapped, false),
+      address: computeV2PoolAddress(
+        currencyA.wrapped,
+        currencyB.wrapped,
+        false
+      ),
     },
     {
       currencyA,
@@ -202,25 +279,27 @@ export const getV2PoolSubgraph = subgraphPoolProviderFactory<PoolMeta, V2PoolWit
     },
   ],
   getPoolsFromSubgraph: async ({ addresses, getPoolMetaByAddress, client }) => {
-    const { pairs: poolsFromSubgraph } = await client.request<{ pairs: V2PoolSubgraphResult[] }>(queryV2Pools, {
+    const { pairs: poolsFromSubgraph } = await client.request<{
+      pairs: V2PoolSubgraphResult[];
+    }>(queryV2Pools, {
       pageSize: 1000,
       poolAddrs: addresses,
-    })
+    });
 
     return poolsFromSubgraph.map(({ id, reserveUSD, reserve0, reserve1 }) => {
-      const meta = getPoolMetaByAddress(id as Address)
+      const meta = getPoolMetaByAddress(id as Address);
       if (!meta) {
-        return null
+        return null;
       }
 
-      const { currencyA, currencyB, address } = meta
+      const { currencyA, currencyB, address } = meta;
       const [token0, token1] = currencyA.wrapped.sortsBefore(currencyB.wrapped)
         ? [currencyA, currencyB]
-        : [currencyB, currencyA]
-      const reserve0Amount = tryParseAmount(reserve0, token0)
-      const reserve1Amount = tryParseAmount(reserve1, token1)
+        : [currencyB, currencyA];
+      const reserve0Amount = tryParseAmount(reserve0, token0);
+      const reserve1Amount = tryParseAmount(reserve1, token1);
       if (!reserve0Amount || !reserve1Amount) {
-        return null
+        return null;
       }
       return {
         address,
@@ -228,24 +307,24 @@ export const getV2PoolSubgraph = subgraphPoolProviderFactory<PoolMeta, V2PoolWit
         reserve0: reserve0Amount,
         reserve1: reserve1Amount,
         tvlUSD: BigInt(Number.parseInt(reserveUSD)),
-      }
-    })
+      };
+    });
   },
-})
+});
 
 interface AllPoolsFactoryParams<P extends WithTvl> {
   // Function identifier
-  id: string
+  id: string;
 
   // Page number starts from 0
   getPoolsFromSubgraph: (params: {
-    lastId: string
-    pageSize: number
-    client: GraphQLClient
-    chainId: number
-  }) => Promise<P[]>
+    lastId: string;
+    pageSize: number;
+    client: GraphQLClient;
+    chainId: number;
+  }) => Promise<P[]>;
 
-  getPoolId: (p: P) => string
+  getPoolId: (p: P) => string;
 }
 
 function subgraphAllPoolsQueryFactory<P extends WithTvl>({
@@ -257,40 +336,45 @@ function subgraphAllPoolsQueryFactory<P extends WithTvl>({
     chainId,
     pageSize = 1000,
   }: {
-    chainId?: ChainId
-    provider?: SubgraphProvider
-    pageSize?: number
+    chainId?: ChainId;
+    provider?: SubgraphProvider;
+    pageSize?: number;
   }): Promise<P[]> {
     if (!provider || !chainId) {
-      throw new Error('No valid subgraph data provider')
+      throw new Error("No valid subgraph data provider");
     }
-    const client = provider({ chainId })
+    const client = provider({ chainId });
 
     if (!client) {
-      throw new Error(`No subgraph client found for chainId ${chainId}`)
+      throw new Error(`No subgraph client found for chainId ${chainId}`);
     }
 
-    let hasMorePools = true
-    let lastId = ''
-    let pools: P[] = []
+    let hasMorePools = true;
+    let lastId = "";
+    let pools: P[] = [];
     while (hasMorePools) {
       // eslint-disable-next-line no-await-in-loop
-      const poolsAtCurrentPage = await getPoolsFromSubgraph({ client, lastId, pageSize, chainId })
+      const poolsAtCurrentPage = await getPoolsFromSubgraph({
+        client,
+        lastId,
+        pageSize,
+        chainId,
+      });
       if (poolsAtCurrentPage.length < pageSize) {
-        hasMorePools = false
-        pools = [...pools, ...poolsAtCurrentPage]
-        break
+        hasMorePools = false;
+        pools = [...pools, ...poolsAtCurrentPage];
+        break;
       }
-      lastId = getPoolId(poolsAtCurrentPage[poolsAtCurrentPage.length - 1])
-      pools = [...pools, ...poolsAtCurrentPage]
+      lastId = getPoolId(poolsAtCurrentPage[poolsAtCurrentPage.length - 1]);
+      pools = [...pools, ...poolsAtCurrentPage];
     }
-    return pools
-  }
+    return pools;
+  };
 }
 
 const queryAllV3Pools = gql`
   query getPools($pageSize: Int!, $id: String) {
-    v3Pools(first: $pageSize, where: { id_gt: $id }) {
+    pools(first: $pageSize, where: { id_gt: $id }) {
       id
       tick
       token0 {
@@ -307,49 +391,71 @@ const queryAllV3Pools = gql`
       fee
       liquidity
       totalValueLockedUSD
+      deployer
     }
   }
-`
+`;
 
 interface TokenFromSubgraph {
-  symbol: string
-  id: string
-  decimals: string
+  symbol: string;
+  id: string;
+  decimals: string;
 }
 
 export interface V3DetailedPoolSubgraphResult extends V3PoolSubgraphResult {
-  token0: TokenFromSubgraph
-  token1: TokenFromSubgraph
+  token0: TokenFromSubgraph;
+  token1: TokenFromSubgraph;
 }
 
-export const getAllV3PoolsFromSubgraph = subgraphAllPoolsQueryFactory<V3PoolWithTvl>({
-  id: 'getAllV3PoolsFromSubgraph',
-  getPoolsFromSubgraph: async ({ lastId, pageSize, client, chainId }) => {
-    const { pools: poolsFromSubgraph } = await client.request<{ pools: V3DetailedPoolSubgraphResult[] }>(
-      queryAllV3Pools,
-      {
+export const getAllV3PoolsFromSubgraph =
+  subgraphAllPoolsQueryFactory<V3PoolWithTvl>({
+    id: "getAllV3PoolsFromSubgraph",
+    getPoolsFromSubgraph: async ({ lastId, pageSize, client, chainId }) => {
+      const { pools: poolsFromSubgraph } = await client.request<{
+        pools: V3DetailedPoolSubgraphResult[];
+      }>(queryAllV3Pools, {
         pageSize,
         id: lastId,
-      },
-    )
-    return poolsFromSubgraph.map(
-      ({ id, liquidity, sqrtPrice, tick, totalValueLockedUSD, token0, token1, fee }) => {
-        const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0)
-        return {
-          type: PoolType.V3 as const,
-          fee: Number(fee),
-          token0: new Token(chainId, getAddress(token0.id), Number(token0.decimals), token0.symbol),
-          token1: new Token(chainId, getAddress(token1.id), Number(token1.decimals), token1.symbol),
-          liquidity: BigInt(liquidity),
-          sqrtRatioX96: BigInt(sqrtPrice),
-          tick: Number(tick),
-          address: getAddress(id),
-          tvlUSD: BigInt(Number.parseInt(totalValueLockedUSD)),
-          token0ProtocolFee,
-          token1ProtocolFee,
+      });
+      return poolsFromSubgraph.map(
+        ({
+          id,
+          liquidity,
+          sqrtPrice,
+          tick,
+          totalValueLockedUSD,
+          token0,
+          token1,
+          fee,
+          deployer,
+        }) => {
+          const [token0ProtocolFee, token1ProtocolFee] = parseProtocolFees(0);
+          return {
+            type: PoolType.V3 as const,
+            fee: Number(fee),
+            token0: new Token(
+              chainId,
+              getAddress(token0.id),
+              Number(token0.decimals),
+              token0.symbol
+            ),
+            token1: new Token(
+              chainId,
+              getAddress(token1.id),
+              Number(token1.decimals),
+              token1.symbol
+            ),
+            liquidity: BigInt(liquidity),
+            sqrtRatioX96: BigInt(sqrtPrice),
+            tick: Number(tick),
+            address: getAddress(id),
+            tvlUSD: BigInt(Number.parseInt(totalValueLockedUSD)),
+            token0ProtocolFee,
+            token1ProtocolFee,
+            deployer: deployer as Address,
+          };
         }
-      },
-    )
-  },
-  getPoolId: (p) => p.address,
-})
+      );
+    },
+    getPoolId: (p) => p.address,
+  });

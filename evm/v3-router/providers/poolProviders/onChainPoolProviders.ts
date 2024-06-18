@@ -1,15 +1,14 @@
 import { ChainId } from '../../../chains/src'
-import { BigintIsh, Currency, CurrencyAmount, Percent } from '@pancakeswap/sdk'
-import { deserializeToken } from '@pancakeswap/token-lists'
+import { BigintIsh, Currency, CurrencyAmount } from '@pancakeswap/sdk'
 import { parseProtocolFees } from '@pancakeswap/v3-sdk'
 import { Abi, Address, ContractFunctionConfig } from 'viem'
 import { algebraPoolABI } from '../../../abis/AlgebraPoolABI'
 
 import { pancakePairABI } from '../../../abis/IPancakePair'
 import { OnChainProvider, Pool, PoolType, StablePool, V2Pool, V3Pool } from '../../types'
-import { computeV2PoolAddress, computeV3PoolAddress } from '../../utils'
+import { computeV2PoolAddress, computeV3CustomPoolAddress, computeV3PoolAddress } from '../../utils'
 import { PoolMeta, V3PoolMeta } from './internalTypes'
-import { ALGEBRA_POOL_DEPLOYER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
+import { ALGEBRA_POOL_DEPLOYER, CUSTOM_POOL_BASE, CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
 
 export const getV2PoolsOnChain = createOnChainPoolFactory<V2Pool | StablePool, PoolMeta>({
   abi: pancakePairABI,
@@ -50,16 +49,27 @@ export const getV2PoolsOnChain = createOnChainPoolFactory<V2Pool | StablePool, P
 export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3PoolMeta>({
   abi: algebraPoolABI,
   getPossiblePoolMetas: ([currencyA, currencyB]) => {
-    return [100].map((fee) => ({
-      address: computeV3PoolAddress({
+    return [
+      CUSTOM_POOL_DEPLOYER_BLANK,
+      CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+      CUSTOM_POOL_BASE
+    ].map((deployer) => ({
+      address: (deployer === CUSTOM_POOL_BASE ? computeV3PoolAddress({
         poolDeployer: ALGEBRA_POOL_DEPLOYER,
         tokenA: currencyA.wrapped,
         tokenB: currencyB.wrapped,
         initCodeHashManualOverride: POOL_INIT_CODE_HASH
-      }) as Address,
+      }) : computeV3CustomPoolAddress({
+        mainPoolDeployer: ALGEBRA_POOL_DEPLOYER,
+        customPoolDeployer: deployer,
+        tokenA: currencyA.wrapped,
+        tokenB: currencyB.wrapped,
+        initCodeHashManualOverride: POOL_INIT_CODE_HASH
+      })) as Address,
       currencyA,
       currencyB,
-      fee,
+      fee: 100,
+      deployer
     }))
   },
   buildPoolInfoCalls: (address) => [
@@ -72,7 +82,7 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3
       functionName: 'globalState',
     },
   ],
-  buildPool: ({ currencyA, currencyB, address }, [liquidity, globalState]) => {
+  buildPool: ({ currencyA, currencyB, address, deployer }, [liquidity, globalState]) => {
     if (!globalState) {
       return null
     }
@@ -92,6 +102,7 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3
       address,
       token0ProtocolFee,
       token1ProtocolFee,
+      deployer
     }
   },
 })

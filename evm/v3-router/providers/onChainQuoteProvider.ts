@@ -7,7 +7,7 @@ import { Abi, Address } from 'viem'
 import { mixedRouteQuoterV1ABI } from '../../abis/algebra/IMixedRouteQuoterV1'
 import { algebraQuoterABI } from '../../abis/algebra/IQuoter'
 import { MIXED_ROUTE_QUOTER_ADDRESSES, V3_QUOTER_ADDRESSES } from '../../constants'
-import { BATCH_MULTICALL_CONFIGS } from '../../constants/multicall'
+import { BATCH_MULTICALL_CONFIGS } from '../../constants'
 import { BatchMulticallConfigs, ChainMap } from '../../types'
 import {
   GasModel,
@@ -25,8 +25,7 @@ import { PancakeMulticallProvider } from './multicallSwapProvider'
 const DEFAULT_BATCH_RETRIES = 2
 
 const SUCCESS_RATE_CONFIG = {
-  [ChainId.XLAYER]: 0.1,
-  [ChainId.XLAYER_TESTNET]: 0.1
+  [ChainId.HOLESKY]: 0.1,
 } as const satisfies Record<ChainId, number>
 
 type V3Inputs = [string, string]
@@ -135,7 +134,7 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
         const multicallConfigs =
           multicallConfigsOverride?.[chainId as ChainId] ||
           BATCH_MULTICALL_CONFIGS[chainId as ChainId] ||
-          BATCH_MULTICALL_CONFIGS[ChainId.XLAYER_TESTNET]
+          BATCH_MULTICALL_CONFIGS[ChainId.HOLESKY]
         const {
           defaultConfig: { gasLimitPerCall: defaultGasLimitPerCall, dropUnexecutedCalls },
         } = multicallConfigs

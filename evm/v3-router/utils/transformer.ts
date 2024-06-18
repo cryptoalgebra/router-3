@@ -4,7 +4,7 @@ import { Address } from 'viem'
 import { ADDRESS_ZERO } from '@pancakeswap/v3-sdk'
 import { Pool, PoolType, Route, SmartRouterTrade, StablePool, V2Pool, V3Pool } from '../types'
 import { isStablePool, isV2Pool, isV3Pool } from './pool'
-import { Native } from '@cryptoalgebra/integral-sdk'
+import { Native } from '@cryptoalgebra/custom-pools-sdk'
 
 const ONE_HUNDRED = BigInt(100)
 

@@ -1,5 +1,5 @@
 import { Currency, Pair, Price, Token } from '@pancakeswap/sdk'
-import { computePoolAddress } from '@cryptoalgebra/swapx-sdk'
+import { computePoolAddress, computeCustomPoolAddress } from '@cryptoalgebra/custom-pools-sdk'
 import { Pool as SDKV3Pool } from '@pancakeswap/v3-sdk'
 import memoize from 'lodash/memoize.js'
 import { Address, keccak256, encodePacked, getCreate2Address } from 'viem'
@@ -61,6 +61,12 @@ export const computeV3PoolAddress = memoize(
   computePoolAddress,
   ({ poolDeployer, tokenA, tokenB, initCodeHashManualOverride }) =>
     `${tokenA.chainId}_${poolDeployer}_${tokenA.address}_${initCodeHashManualOverride}_${tokenB.address}`,
+)
+
+export const computeV3CustomPoolAddress = memoize(
+  computeCustomPoolAddress,
+  ({ mainPoolDeployer, tokenA, tokenB, customPoolDeployer, initCodeHashManualOverride }) =>
+    `${tokenA.chainId}_${mainPoolDeployer}_${customPoolDeployer}_${tokenA.address}_${initCodeHashManualOverride}_${tokenB.address}`,
 )
 
 export const computeV2PoolAddress = memoize(

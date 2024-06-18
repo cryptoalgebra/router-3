@@ -19,20 +19,18 @@ export const STABLESWAP_SUBGRAPHS = {} as const
 
 export function getV3Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx',
-    [ChainId.XLAYER]: '',
+    [ChainId.HOLESKY]: 'https://api.studio.thegraph.com/proxy/50593/integral-v1-1/version/latest',
   } as const satisfies Record<ChainId, string | null>
 }
 
 export function getV2Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx'
+    // [ChainId.HOLESKY]: 'https://api.studio.thegraph.com/proxy/50593/integral-v1-1/version/latest'
   }
 }
 
 export function getBlocksSubgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.XLAYER_TESTNET]: 'http://3.129.109.139:7100/subgraphs/name/x1-testnet/blocks',
-    [ChainId.XLAYER]: '',
+    [ChainId.HOLESKY]: 'https://api.thegraph.com/subgraphs/name/iliaazhel/goerli-blocks'
   } as const
 }

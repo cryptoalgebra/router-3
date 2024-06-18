@@ -1,29 +1,17 @@
 import { ChainId } from '../chains/src'
 import { Token } from '@pancakeswap/sdk'
 
-import { ChainMap, ChainTokenList } from '../types'
-import { ROUTER_V2, SWAP_ROUTER_02 } from './addresses'
-import { xLayerTestnetTokens } from './tokens'
+import { ChainTokenList } from '../types'
+import { ALGEBRA_ROUTER } from './addresses'
+import { holeskyTokens } from './tokens'
 
 export const SMART_ROUTER_ADDRESSES = {
-  [ChainId.XLAYER_TESTNET]: SWAP_ROUTER_02,
-  [ChainId.XLAYER]: SWAP_ROUTER_02,
+  [ChainId.HOLESKY]: ALGEBRA_ROUTER,
 } as const satisfies Record<ChainId, string>
-
-export const V2_ROUTER_ADDRESS: ChainMap<string> = {
-  [ChainId.XLAYER_TESTNET]: ROUTER_V2,
-  [ChainId.XLAYER]: ROUTER_V2
-}
-
-export const STABLE_SWAP_INFO_ADDRESS: ChainMap<string> = {
-  [ChainId.XLAYER]: '',
-  [ChainId.XLAYER_TESTNET]: ''
-}
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.XLAYER_TESTNET]: Object.values(xLayerTestnetTokens),
-  [ChainId.XLAYER]: []
+  [ChainId.HOLESKY]: Object.values(holeskyTokens),
 }
 
 

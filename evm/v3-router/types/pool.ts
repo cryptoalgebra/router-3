@@ -34,6 +34,7 @@ export interface V3Pool extends BasePool {
   sqrtRatioX96: bigint
   tick: number
   address: Address
+  deployer: Address
   token0ProtocolFee: Percent
   token1ProtocolFee: Percent
 

@@ -1,4 +1,4 @@
-import { Currency } from '@cryptoalgebra/integral-sdk'
+import { Currency } from '@cryptoalgebra/custom-pools-sdk'
 import { ChainId } from '../../chains/src'
 
 export function isCurrenciesSameChain(...currencies: Currency[]) {

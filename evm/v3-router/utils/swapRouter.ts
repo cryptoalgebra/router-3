@@ -1,24 +1,16 @@
 import { encodeFunctionData, Hex, Address } from 'viem'
-import { Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '../../chains/src'
-import { FeeOptions, MethodParameters, Payments, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
+import { Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress } from '@pancakeswap/sdk'
+import { FeeOptions, MethodParameters, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
 import invariant from 'tiny-invariant'
 
-import { swapRouter02Abi } from '../../abis/algebra/ISwapRouter02'
 import { ADDRESS_THIS, MSG_SENDER } from '../../constants'
-import { ApproveAndCall, ApprovalTypes, CondensedAddLiquidityOptions } from './approveAndCall'
-import { SmartRouterTrade, V3Pool, BaseRoute, RouteType, StablePool, PoolType } from '../types'
+import { SmartRouterTrade, V3Pool, RouteType } from '../types'
 import { MulticallExtended, Validation } from './multicallExtended'
 import { PaymentsExtended } from './paymentsExtended'
 import { encodeMixedRouteToPath } from './encodeMixedRouteToPath'
-import { partitionMixedRouteByProtocol } from './partitionMixedRouteByProtocol'
 import { maximumAmountIn, minimumAmountOut } from './maximumAmount'
-import { isStablePool, isV2Pool, isV3Pool } from './pool'
-import { buildBaseRoute } from './route'
-import { getOutputOfPools } from './getOutputOfPools'
 import { getPriceImpact } from './getPriceImpact'
-import { ADDRESS_ZERO } from '@cryptoalgebra/integral-sdk'
-import { xLayerTestnetTokens } from '../../constants/tokens'
+import { algebraRouterABI } from '../../abis/algebra/algebraRouter'
 
 const ZERO = BigInt(0)
 const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
@@ -66,7 +58,7 @@ type AnyTradeType = SmartRouterTrade<TradeType> | SmartRouterTrade<TradeType>[]
  * Represents the Pancakeswap V2 + V3 + StableSwap SwapRouter02, and has static methods for helping execute trades.
  */
 export abstract class SwapRouter {
-  public static ABI = swapRouter02Abi
+  public static ABI = algebraRouterABI
 
   /**
    * Cannot be constructed.
@@ -82,56 +74,56 @@ export abstract class SwapRouter {
    * @param performAggregatedSlippageCheck Flag for whether we want to perform an aggregated slippage check
    * @returns A string array of calldatas for the trade.
    */
-  private static encodeV2Swap(
-    trade: SmartRouterTrade<TradeType>,
-    options: SwapOptions,
-    routerMustCustody: boolean,
-    performAggregatedSlippageCheck: boolean,
-  ): Hex {
-    const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance).quotient
-    const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance).quotient
+  // private static encodeV2Swap(
+  //   trade: SmartRouterTrade<TradeType>,
+  //   options: SwapOptions,
+  //   routerMustCustody: boolean,
+  //   performAggregatedSlippageCheck: boolean,
+  // ): Hex {
+  //   const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance).quotient
+  //   const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance).quotient
 
-    // V2 trade should have only one route
-    const route = trade.routes[0]
+  //   // V2 trade should have only one route
+  //   const route = trade.routes[0]
 
-    const path = []
+  //   const path = []
 
-    for (let i = 0; i <= route.path.length - 2; i++) {
+  //   for (let i = 0; i <= route.path.length - 2; i++) {
 
-      const token = route.path[i]
-      const nextToken = route.path[i + 1]
+  //     const token = route.path[i]
+  //     const nextToken = route.path[i + 1]
 
-      path.push({
-        from: token.wrapped.address as Address,
-        to: nextToken.wrapped.address as Address,
-        stable: route.pools[path.length].type === PoolType.STABLE
-      })
+  //     path.push({
+  //       from: token.wrapped.address as Address,
+  //       to: nextToken.wrapped.address as Address,
+  //       stable: route.pools[path.length].type === PoolType.STABLE
+  //     })
 
-    }
+  //   }
 
-    const recipient = routerMustCustody
-      ? ADDRESS_THIS
-      : typeof options.recipient === 'undefined'
-      ? MSG_SENDER
-      : validateAndParseAddress(options.recipient)
+  //   const recipient = routerMustCustody
+  //     ? ADDRESS_THIS
+  //     : typeof options.recipient === 'undefined'
+  //     ? MSG_SENDER
+  //     : validateAndParseAddress(options.recipient)
 
-      if (trade.tradeType === TradeType.EXACT_INPUT) {
-        const exactInputParams = [amountIn, performAggregatedSlippageCheck ? 0n : amountOut, path, recipient] as const
+  //     if (trade.tradeType === TradeType.EXACT_INPUT) {
+  //       const exactInputParams = [amountIn, performAggregatedSlippageCheck ? 0n : amountOut, path, recipient] as const
   
-        return encodeFunctionData({
-          abi: SwapRouter.ABI,
-          functionName: 'swapExactTokensForTokens',
-          args: exactInputParams,
-        })
-      }
-      const exactOutputParams = [amountIn, amountOut, path, recipient] as const
+  //       return encodeFunctionData({
+  //         abi: SwapRouter.ABI,
+  //         functionName: 'swapExactTokensForTokens',
+  //         args: exactInputParams,
+  //       })
+  //     }
+  //     const exactOutputParams = [amountIn, amountOut, path, recipient] as const
   
-      return encodeFunctionData({
-        abi: SwapRouter.ABI,
-        functionName: 'swapExactTokensForTokens',
-        args: exactOutputParams,
-      })
-  }
+  //     return encodeFunctionData({
+  //       abi: SwapRouter.ABI,
+  //       functionName: 'swapExactTokensForTokens',
+  //       args: exactOutputParams,
+  //     })
+  // }
 
   /**
    * @notice Generates the calldata for a Swap with a V3 Route.
@@ -172,6 +164,8 @@ export abstract class SwapRouter {
             amountIn,
             amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
             limitSqrtPrice: BigInt(0),
+            deployer: (pools[0] as V3Pool).deployer as Address,
+            deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
           }
 
           calldatas.push(
@@ -189,6 +183,8 @@ export abstract class SwapRouter {
             amountOut,
             amountInMaximum: amountIn,
             limitSqrtPrice: BigInt(0),
+            deployer: (pools[0] as V3Pool).deployer as Address,
+            deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
           }
 
           calldatas.push(
@@ -212,6 +208,8 @@ export abstract class SwapRouter {
             recipient,
             amountIn,
             amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
+            deployer: (pools[0] as V3Pool).deployer as Address,
+            deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
           }
 
           calldatas.push(
@@ -227,6 +225,8 @@ export abstract class SwapRouter {
             recipient,
             amountOut,
             amountInMaximum: amountIn,
+            deployer: (pools[0] as V3Pool).deployer as Address,
+            deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
           }
 
           calldatas.push(
@@ -252,185 +252,185 @@ export abstract class SwapRouter {
    * @param performAggregatedSlippageCheck Flag for whether we want to perform an aggregated slippage check
    * @returns A string array of calldatas for the trade.
    */
-  private static encodeMixedRouteSwap(
-    trade: SmartRouterTrade<TradeType>,
-    options: SwapOptions,
-    routerMustCustody: boolean,
-    performAggregatedSlippageCheck: boolean,
-  ): Hex[] {
-    let calldatas: Hex[] = []
+  // private static encodeMixedRouteSwap(
+  //   trade: SmartRouterTrade<TradeType>,
+  //   options: SwapOptions,
+  //   routerMustCustody: boolean,
+  //   performAggregatedSlippageCheck: boolean,
+  // ): Hex[] {
+  //   let calldatas: Hex[] = []
 
-    const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
+  //   const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
 
-    for (const route of trade.routes) {
-      const { inputAmount, outputAmount, pools } = route
-      const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance, inputAmount).quotient
-      const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance, outputAmount).quotient
+  //   for (const route of trade.routes) {
+  //     const { inputAmount, outputAmount, pools } = route
+  //     const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance, inputAmount).quotient
+  //     const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance, outputAmount).quotient
 
-      // flag for whether the trade is single hop or not
-      const singleHop = pools.length === 1
+  //     // flag for whether the trade is single hop or not
+  //     const singleHop = pools.length === 1
 
-      const recipient = routerMustCustody
-        ? ADDRESS_THIS
-        : typeof options.recipient === 'undefined'
-        ? MSG_SENDER
-        : validateAndParseAddress(options.recipient)
+  //     const recipient = routerMustCustody
+  //       ? ADDRESS_THIS
+  //       : typeof options.recipient === 'undefined'
+  //       ? MSG_SENDER
+  //       : validateAndParseAddress(options.recipient)
 
-      const mixedRouteIsAllV3 = (r: Omit<BaseRoute, 'input' | 'output'>) => {
-        return r.pools.every(isV3Pool)
-      }
-      const mixedRouteIsAllV2 = (r: Omit<BaseRoute, 'input' | 'output'>) => {
-        return r.pools.every(isV2Pool) || r.pools.every(isStablePool)
-      }
+  //     const mixedRouteIsAllV3 = (r: Omit<BaseRoute, 'input' | 'output'>) => {
+  //       return r.pools.every(isV3Pool)
+  //     }
+  //     const mixedRouteIsAllV2 = (r: Omit<BaseRoute, 'input' | 'output'>) => {
+  //       return r.pools.every(isV2Pool) || r.pools.every(isStablePool)
+  //     }
 
-      if (singleHop) {
-        /// For single hop, since it isn't really a mixedRoute, we'll just mimic behavior of V3 or V2
-        /// We don't use encodeV3Swap() or encodeV2Swap() because casting the trade to a V3Trade or V2Trade is overcomplex
-        if (mixedRouteIsAllV3(route)) {
-          calldatas = [
-            ...calldatas,
-            ...SwapRouter.encodeV3Swap(
-              {
-                ...trade,
-                routes: [route],
-                inputAmount,
-                outputAmount,
-              },
-              options,
-              routerMustCustody,
-              performAggregatedSlippageCheck,
-            ),
-          ]
-        } else if (mixedRouteIsAllV2(route)) {
-          calldatas = [
-            ...calldatas,
-            SwapRouter.encodeV2Swap(
-              {
-                ...trade,
-                routes: [route],
-                inputAmount,
-                outputAmount,
-              },
-              options,
-              routerMustCustody,
-              performAggregatedSlippageCheck,
-            ),
-          ]
-        } else {
-          throw new Error('Unsupported route to encode')
-        }
-      } else {
-        const sections = partitionMixedRouteByProtocol(route)
+  //     if (singleHop) {
+  //       /// For single hop, since it isn't really a mixedRoute, we'll just mimic behavior of V3 or V2
+  //       /// We don't use encodeV3Swap() or encodeV2Swap() because casting the trade to a V3Trade or V2Trade is overcomplex
+  //       if (mixedRouteIsAllV3(route)) {
+  //         calldatas = [
+  //           ...calldatas,
+  //           ...SwapRouter.encodeV3Swap(
+  //             {
+  //               ...trade,
+  //               routes: [route],
+  //               inputAmount,
+  //               outputAmount,
+  //             },
+  //             options,
+  //             routerMustCustody,
+  //             performAggregatedSlippageCheck,
+  //           ),
+  //         ]
+  //       } else if (mixedRouteIsAllV2(route)) {
+  //         calldatas = [
+  //           ...calldatas,
+  //           SwapRouter.encodeV2Swap(
+  //             {
+  //               ...trade,
+  //               routes: [route],
+  //               inputAmount,
+  //               outputAmount,
+  //             },
+  //             options,
+  //             routerMustCustody,
+  //             performAggregatedSlippageCheck,
+  //           ),
+  //         ]
+  //       } else {
+  //         throw new Error('Unsupported route to encode')
+  //       }
+  //     } else {
+  //       const sections = partitionMixedRouteByProtocol(route)
 
-        const isLastSectionInRoute = (i: number) => {
-          return i === sections.length - 1
-        }
+  //       const isLastSectionInRoute = (i: number) => {
+  //         return i === sections.length - 1
+  //       }
 
-        let outputToken
-        let inputToken = inputAmount.currency.wrapped
+  //       let outputToken
+  //       let inputToken = inputAmount.currency.wrapped
 
-        for (let i = 0; i < sections.length; i++) {
-          const section = sections[i]
-          /// Now, we get output of this section
-          outputToken = getOutputOfPools(section, inputToken)
+  //       for (let i = 0; i < sections.length; i++) {
+  //         const section = sections[i]
+  //         /// Now, we get output of this section
+  //         outputToken = getOutputOfPools(section, inputToken)
 
-          const newRoute = buildBaseRoute([...section], inputToken, outputToken)
+  //         const newRoute = buildBaseRoute([...section], inputToken, outputToken)
 
-          /// Previous output is now input
-          inputToken = outputToken.wrapped
+  //         /// Previous output is now input
+  //         inputToken = outputToken.wrapped
 
-          const lastSectionInRoute = isLastSectionInRoute(i)
-          // By default router holds funds until the last swap, then it is sent to the recipient
-          // special case exists where we are unwrapping WETH output, in which case `routerMustCustody` is set to true
-          // and router still holds the funds. That logic bundled into how the value of `recipient` is calculated
-          const recipientAddress = lastSectionInRoute ? recipient : ADDRESS_THIS
-          const inAmount = i === 0 ? amountIn : BigInt(0)
-          const outAmount = !lastSectionInRoute ? BigInt(0) : amountOut
-          if (mixedRouteIsAllV3(newRoute)) {
-            const pathStr = encodeMixedRouteToPath(newRoute, !isExactIn, true)
-            if (isExactIn) {
-              const exactInputParams = {
-                path: pathStr,
-                recipient: recipientAddress,
-                amountIn: inAmount,
-                amountOutMinimum: outAmount,
-              }
-              calldatas.push(
-                encodeFunctionData({
-                  abi: SwapRouter.ABI,
-                  functionName: 'exactInput',
-                  args: [exactInputParams],
-                }),
-              )
-            } else {
-              const exactOutputParams = {
-                path: pathStr,
-                recipient,
-                amountOut: outAmount,
-                amountInMaximum: inAmount,
-              }
+  //         const lastSectionInRoute = isLastSectionInRoute(i)
+  //         // By default router holds funds until the last swap, then it is sent to the recipient
+  //         // special case exists where we are unwrapping WETH output, in which case `routerMustCustody` is set to true
+  //         // and router still holds the funds. That logic bundled into how the value of `recipient` is calculated
+  //         const recipientAddress = lastSectionInRoute ? recipient : ADDRESS_THIS
+  //         const inAmount = i === 0 ? amountIn : BigInt(0)
+  //         const outAmount = !lastSectionInRoute ? BigInt(0) : amountOut
+  //         if (mixedRouteIsAllV3(newRoute)) {
+  //           const pathStr = encodeMixedRouteToPath(newRoute, !isExactIn, true)
+  //           if (isExactIn) {
+  //             const exactInputParams = {
+  //               path: pathStr,
+  //               recipient: recipientAddress,
+  //               amountIn: inAmount,
+  //               amountOutMinimum: outAmount,
+  //             }
+  //             calldatas.push(
+  //               encodeFunctionData({
+  //                 abi: SwapRouter.ABI,
+  //                 functionName: 'exactInput',
+  //                 args: [exactInputParams],
+  //               }),
+  //             )
+  //           } else {
+  //             const exactOutputParams = {
+  //               path: pathStr,
+  //               recipient,
+  //               amountOut: outAmount,
+  //               amountInMaximum: inAmount,
+  //             }
 
-              calldatas.push(
-                encodeFunctionData({
-                  abi: SwapRouter.ABI,
-                  functionName: 'exactOutput',
-                  args: [exactOutputParams],
-                }),
-              )
-            }
-          } else if (mixedRouteIsAllV2(newRoute)) {
+  //             calldatas.push(
+  //               encodeFunctionData({
+  //                 abi: SwapRouter.ABI,
+  //                 functionName: 'exactOutput',
+  //                 args: [exactOutputParams],
+  //               }),
+  //             )
+  //           }
+  //         } else if (mixedRouteIsAllV2(newRoute)) {
 
-            const path = []
+  //           const path = []
 
-            for (let i = 0; i <= newRoute.path.length - 2; i++) {
+  //           for (let i = 0; i <= newRoute.path.length - 2; i++) {
         
-              const token = newRoute.path[i]
-              const nextToken = newRoute.path[i + 1]
+  //             const token = newRoute.path[i]
+  //             const nextToken = newRoute.path[i + 1]
         
-              path.push({
-                from: token.wrapped.address as Address,
-                to: nextToken.wrapped.address as Address,
-                stable: newRoute.pools[path.length].type === PoolType.STABLE
-              })
+  //             path.push({
+  //               from: token.wrapped.address as Address,
+  //               to: nextToken.wrapped.address as Address,
+  //               stable: newRoute.pools[path.length].type === PoolType.STABLE
+  //             })
         
-            }
+  //           }
 
-            if (isExactIn) {
-              const exactInputParams = [
-                inAmount, // amountIn
-                outAmount, // amountOutMin
-                path, // path
-                recipientAddress, // to
-              ] as const
+  //           if (isExactIn) {
+  //             const exactInputParams = [
+  //               inAmount, // amountIn
+  //               outAmount, // amountOutMin
+  //               path, // path
+  //               recipientAddress, // to
+  //             ] as const
 
-              calldatas.push(
-                encodeFunctionData({
-                  abi: SwapRouter.ABI,
-                  functionName: 'swapExactTokensForTokens',
-                  args: exactInputParams,
-                }),
-              )
-            } else {
-              const exactOutputParams = [inAmount, outAmount, path, recipientAddress] as const
+  //             calldatas.push(
+  //               encodeFunctionData({
+  //                 abi: SwapRouter.ABI,
+  //                 functionName: 'swapExactTokensForTokens',
+  //                 args: exactInputParams,
+  //               }),
+  //             )
+  //           } else {
+  //             const exactOutputParams = [inAmount, outAmount, path, recipientAddress] as const
 
-              calldatas.push(
-                encodeFunctionData({
-                  abi: SwapRouter.ABI,
-                  functionName: 'swapExactTokensForTokens',
-                  args: exactOutputParams,
-                }),
-              )
-            }
+  //             calldatas.push(
+  //               encodeFunctionData({
+  //                 abi: SwapRouter.ABI,
+  //                 functionName: 'swapExactTokensForTokens',
+  //                 args: exactOutputParams,
+  //               }),
+  //             )
+  //           }
 
-          } else {
-            throw new Error('Unsupported route')
-          }
-        }
-      }
-    }
+  //         } else {
+  //           throw new Error('Unsupported route')
+  //         }
+  //       }
+  //     }
+  //   }
 
-    return calldatas
-  }
+  //   return calldatas
+  // }
 
   private static encodeSwaps(
     anyTrade: AnyTradeType,
@@ -491,7 +491,7 @@ export abstract class SwapRouter {
 
     for (const trade of trades) {
       if (trade.routes.length === 1 && trade.routes[0].type === RouteType.V2) {
-        calldatas.push(SwapRouter.encodeV2Swap(trade, options, routerMustCustody, performAggregatedSlippageCheck))
+        // calldatas.push(SwapRouter.encodeV2Swap(trade, options, routerMustCustody, performAggregatedSlippageCheck))
       } else if (trade.routes.every((r) => r.type === RouteType.V3)) {
         for (const calldata of SwapRouter.encodeV3Swap(
           trade,
@@ -502,14 +502,14 @@ export abstract class SwapRouter {
           calldatas.push(calldata)
         }
       } else {
-        for (const calldata of SwapRouter.encodeMixedRouteSwap(
-          trade,
-          options,
-          routerMustCustody,
-          performAggregatedSlippageCheck,
-        )) {
-          calldatas.push(calldata)
-        }
+        // for (const calldata of SwapRouter.encodeMixedRouteSwap(
+        //   trade,
+        //   options,
+        //   routerMustCustody,
+        //   performAggregatedSlippageCheck,
+        // )) {
+        //   calldatas.push(calldata)
+        // }
       }
     }
 
@@ -582,117 +582,8 @@ export abstract class SwapRouter {
     }
 
     return {
-      calldata: MulticallExtended.encodeMulticall(calldatas, options.deadlineOrPreviousBlockhash),
+      calldata: MulticallExtended.encodeMulticall(calldatas),
       value: toHex(inputIsNative ? totalAmountIn.quotient : ZERO),
-    }
-  }
-
-  /**
-   * Produces the on-chain method name to call and the hex encoded parameters to pass as arguments for a given trade.
-   * @param trades to produce call parameters for
-   * @param options options for the call parameters
-   */
-  public static swapAndAddCallParameters(
-    trades: AnyTradeType,
-    options: SwapAndAddOptions,
-    position: Position,
-    addLiquidityOptions: CondensedAddLiquidityOptions,
-    tokenInApprovalType: ApprovalTypes,
-    tokenOutApprovalType: ApprovalTypes,
-  ): MethodParameters {
-    const {
-      calldatas,
-      inputIsNative,
-      outputIsNative,
-      sampleTrade,
-      totalAmountIn: totalAmountSwapped,
-      quoteAmountOut,
-      minimumAmountOut: minAmountOut,
-    } = SwapRouter.encodeSwaps(trades, options, true)
-
-    // encode output token permit if necessary
-    if (options.outputTokenPermit) {
-      invariant(quoteAmountOut.currency.isToken, 'NON_TOKEN_PERMIT_OUTPUT')
-      calldatas.push(SelfPermit.encodePermit(quoteAmountOut.currency, options.outputTokenPermit))
-    }
-
-    const {
-      inputAmount: {
-        currency: { chainId },
-      },
-    } = sampleTrade
-    const zeroForOne = position.pool.token0.wrapped.address === totalAmountSwapped.currency.wrapped.address
-    const { positionAmountIn, positionAmountOut } = SwapRouter.getPositionAmounts(position, zeroForOne)
-
-    // if tokens are native they will be converted to WETH9
-    const tokenIn = inputIsNative ? xLayerTestnetTokens.wokb : positionAmountIn.currency.wrapped
-    const tokenOut = outputIsNative ? xLayerTestnetTokens.wokb : positionAmountOut.currency.wrapped
-
-    // if swap output does not make up whole outputTokenBalanceDesired, pull in remaining tokens for adding liquidity
-    const amountOutRemaining = positionAmountOut.subtract(quoteAmountOut.wrapped)
-    if (amountOutRemaining.greaterThan(CurrencyAmount.fromRawAmount(positionAmountOut.currency, 0))) {
-      // if output is native, this means the remaining portion is included as native value in the transaction
-      // and must be wrapped. Otherwise, pull in remaining ERC20 token.
-      if (outputIsNative) {
-        calldatas.push(PaymentsExtended.encodeWrapETH(amountOutRemaining.quotient))
-      } else {
-        calldatas.push(PaymentsExtended.encodePull(tokenOut, amountOutRemaining.quotient))
-      }
-    }
-
-    // if input is native, convert to WETH9, else pull ERC20 token
-    if (inputIsNative) {
-      calldatas.push(PaymentsExtended.encodeWrapETH(positionAmountIn.quotient))
-    } else {
-      calldatas.push(PaymentsExtended.encodePull(tokenIn, positionAmountIn.quotient))
-    }
-
-    // approve token balances to NFTManager
-    if (tokenInApprovalType !== ApprovalTypes.NOT_REQUIRED)
-      calldatas.push(ApproveAndCall.encodeApprove(tokenIn, tokenInApprovalType))
-    if (tokenOutApprovalType !== ApprovalTypes.NOT_REQUIRED)
-      calldatas.push(ApproveAndCall.encodeApprove(tokenOut, tokenOutApprovalType))
-
-    // represents a position with token amounts resulting from a swap with maximum slippage
-    // hence the minimal amount out possible.
-    const minimalPosition = Position.fromAmounts({
-      pool: position.pool,
-      tickLower: position.tickLower,
-      tickUpper: position.tickUpper,
-      amount0: zeroForOne ? position.amount0.quotient.toString() : minAmountOut.quotient.toString(),
-      amount1: zeroForOne ? minAmountOut.quotient.toString() : position.amount1.quotient.toString(),
-      useFullPrecision: false,
-    })
-
-    // encode NFTManager add liquidity
-    calldatas.push(
-      ApproveAndCall.encodeAddLiquidity(position, minimalPosition, addLiquidityOptions, options.slippageTolerance),
-    )
-
-    // sweep remaining tokens
-    if (inputIsNative) {
-      calldatas.push(PaymentsExtended.encodeUnwrapWETH9(ZERO))
-    } else {
-      calldatas.push(PaymentsExtended.encodeSweepToken(tokenIn, ZERO))
-    }
-    if (outputIsNative) {
-      calldatas.push(PaymentsExtended.encodeUnwrapWETH9(ZERO))
-    } else {
-      calldatas.push(PaymentsExtended.encodeSweepToken(tokenOut, ZERO))
-    }
-
-    let value: bigint
-    if (inputIsNative) {
-      value = totalAmountSwapped.wrapped.add(positionAmountIn.wrapped).quotient
-    } else if (outputIsNative) {
-      value = amountOutRemaining.quotient
-    } else {
-      value = ZERO
-    }
-
-    return {
-      calldata: MulticallExtended.encodeMulticall(calldatas, options.deadlineOrPreviousBlockhash),
-      value: toHex(value.toString()),
     }
   }
 

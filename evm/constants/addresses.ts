@@ -18,14 +18,14 @@ export const ALGEBRA_ROUTER: Address =
 
 /* V2 */
 export const PAIR_FACTORY_UPGRADEABLE: Address =
-    '0xf532839E3B36Bac7281B4986e197127166eFD6De';
+    '0xef6726076b6c155bcb05e2f85fd3b373e049ed4d';
 
 export const ROUTER_V2: Address =
-    '0x2315F2F69f77e6E2876257Be4c4018E3bdBCa5E9'; // in use
+    '0x590DCBB467B087eeB44102165176E1b2c72BA3c5'; // in use
 
 /* Multi */
 export const SWAP_ROUTER_02: Address =
-    '0x6F40a7D8c3A5CFBF1203F896dE89fFCaC3fb79dc';
+    '0xCc486a16f069D6618c007eFCde79B9A817cBc41A';
 
 export const MIXED_ROUTE_QUOTER_V1: Address =
-    '0xa35659B073FFFD5740c01238b5650a35F6E5C5F4'; // in use
+    '0x97A7A83B01a0ad744B84DB34f97F61b016848b2A'; // in use

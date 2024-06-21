@@ -2,7 +2,7 @@ Arguments:
   /home/lilchizh/.nvm/versions/node/v18.19.1/bin/node /home/lilchizh/.yarn/releases/yarn-classic.cjs publish
 
 PATH: 
-  /home/lilchizh/.local/share/pnpm:/home/lilchizh/.nvm/versions/node/v18.19.1/bin:/home/lilchizh/.local/bin:/home/lilchizh/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin
+  /home/lilchizh/.local/share/pnpm:/home/lilchizh/.nvm/versions/node/v18.19.1/bin:/home/lilchizh/.local/bin:/home/lilchizh/bin:/usr/local/bin:/usr/local/sbin:/usr/bin:/usr/sbin:/home/lilchizh/Documents/router-3/node_modules/.bin
 
 Yarn version: 
   1.22.19
@@ -14,17 +14,17 @@ Platform:
   linux x64
 
 Trace: 
-  Error: canceled
-      at Interface.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:131557:13)
-      at Interface.emit (node:events:517:28)
-      at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1132:18)
-      at ReadStream.onkeypress (node:internal/readline/interface:271:20)
-      at ReadStream.emit (node:events:517:28)
-      at emitKeys (node:internal/readline/utils:371:14)
-      at emitKeys.next (<anonymous>)
-      at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
-      at ReadStream.emit (node:events:517:28)
-      at addChunk (node:internal/streams/readable:368:12)
+  Error: https://registry.yarnpkg.com/-/user/org.couchdb.user:lilchizh: failed to authenticate: Could not authenticate lilchizh: bad password
+      at params.callback [as _callback] (/home/lilchizh/.yarn/releases/yarn-classic.cjs:77675:18)
+      at self.callback (/home/lilchizh/.yarn/releases/yarn-classic.cjs:135297:22)
+      at Request.emit (node:events:517:28)
+      at Request.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:136269:10)
+      at Request.emit (node:events:517:28)
+      at IncomingMessage.<anonymous> (/home/lilchizh/.yarn/releases/yarn-classic.cjs:136191:12)
+      at Object.onceWrapper (node:events:631:28)
+      at IncomingMessage.emit (node:events:529:35)
+      at endReadableNT (node:internal/streams/readable:1400:12)
+      at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
 
 npm manifest: 
   {
@@ -88,7 +88,7 @@ npm manifest:
         "require": "./dist/evm.js"
       }
     },
-    "version": "1.0.1"
+    "version": "1.0.19"
   }
 
 yarn manifest: 

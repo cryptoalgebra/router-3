@@ -12,9 +12,9 @@ export function computePairAddress(token0: Token, token1: Token, isStable: boole
     encodePacked(['address', 'address', 'bool'], [_token0.address as Address, _token1.address as Address, isStable])
   )
   return getCreate2Address({
-    from: '0xf532839E3B36Bac7281B4986e197127166eFD6De',
+    from: '0xef6726076b6c155bcb05e2f85fd3b373e049ed4d',
     salt,
-    bytecodeHash: '0x0d0128a81f322b1beff50a2fe5e23a194fffc4f7c81736e27af97cded386e788'
+    bytecodeHash: '0x6c45999f36731ff6ab43e943fca4b5a700786bbb202116cf6633b32039161e05'
   })
 }
 

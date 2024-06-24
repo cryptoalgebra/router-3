@@ -19,14 +19,14 @@ export const STABLESWAP_SUBGRAPHS = {} as const
 
 export function getV3Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx',
+    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/stage',
     [ChainId.XLAYER]: '',
   } as const satisfies Record<ChainId, string | null>
 }
 
 export function getV2Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx'
+    [ChainId.XLAYER_TESTNET]: 'https://swapx-graph.rocknblock.io/subgraphs/name/swapx/stage'
   }
 }
 

@@ -1,6 +1,5 @@
-import { Price, TradeType, ZERO } from '@pancakeswap/sdk'
-
 import { SmartRouterTrade } from '../types'
+import { ZERO, Price, TradeType } from '@cryptoalgebra/swapx-sdk'
 
 export function getExecutionPrice(trade: SmartRouterTrade<TradeType> | null | undefined) {
   if (!trade) {

@@ -1,4 +1,5 @@
-import { BigintIsh, Currency, CurrencyAmount, TradeType, ZERO } from '@pancakeswap/sdk'
+import { BigintIsh, Currency, CurrencyAmount, Token, TradeType } from '@pancakeswap/sdk'
+import { Currency as CurrencyJSBI, CurrencyAmount as CurrencyAmountJSBI, ZERO } from '@cryptoalgebra/swapx-sdk'
 import { ChainId } from '../chains/src'
 
 import { computeAllRoutes, getBestRouteCombinationByQuotes } from './functions'
@@ -8,15 +9,22 @@ import { BestRoutes, TradeConfig, RouteConfig, SmartRouterTrade, RouteType } fro
 import { ROUTE_CONFIG_BY_CHAIN } from './constants'
 
 export async function getBestTrade(
-  amount: CurrencyAmount<Currency>,
-  currency: Currency,
+  amount: CurrencyAmount<Currency> | CurrencyAmountJSBI<CurrencyJSBI>,
+  currency: Currency | CurrencyJSBI,
   tradeType: TradeType,
   config: TradeConfig,
 ): Promise<SmartRouterTrade<TradeType> | null> {
+
+  const currencyBN = new Token(currency.chainId, currency.wrapped.address, currency.decimals, currency.symbol || "", currency.name)
+
+  const amountCurrencyBN = new Token(amount.currency.chainId, amount.currency.wrapped.address, amount.currency.decimals, amount.currency.symbol || "", amount.currency.name)
+
+  const amountBN = CurrencyAmount.fromRawAmount(amountCurrencyBN, BigInt(amount.quotient.toString()))
+
   const { blockNumber: blockNumberFromConfig } = config
   const blockNumber: BigintIsh | undefined =
     typeof blockNumberFromConfig === 'function' ? await blockNumberFromConfig() : blockNumberFromConfig
-  const bestRoutes = await getBestRoutes(amount, currency, tradeType, {
+  const bestRoutes = await getBestRoutes(amountBN, currencyBN, tradeType, {
     ...config,
     blockNumber,
   })
@@ -27,13 +35,14 @@ export async function getBestTrade(
   const { routes, gasEstimateInUSD, gasEstimate, inputAmount, outputAmount } = bestRoutes
   // TODO restrict trade type to exact input if routes include one of the old
   // stable swap pools, which only allow to swap with exact input
+  
   return {
     tradeType,
     routes,
     gasEstimate,
     gasEstimateInUSD,
-    inputAmount,
-    outputAmount,
+    inputAmount: CurrencyAmountJSBI.fromRawAmount(inputAmount.currency, inputAmount.quotient.toString()),
+    outputAmount: CurrencyAmountJSBI.fromRawAmount(outputAmount.currency, outputAmount.quotient.toString()),
     blockNumber,
   }
 }

@@ -1,4 +1,5 @@
 import { Currency, CurrencyAmount } from '@pancakeswap/sdk'
+import { Currency as CurrencyJSBI, CurrencyAmount as CurrencyAmountJSBI } from '@cryptoalgebra/swapx-sdk'
 
 import { GasCost } from './gasCost'
 import { Pool } from './pool'
@@ -34,8 +35,8 @@ export interface RouteWithoutQuote extends BaseRoute {
 export type RouteEssentials = Omit<RouteWithoutQuote, 'input' | 'output' | 'amount'>
 
 export interface Route extends RouteEssentials {
-  inputAmount: CurrencyAmount<Currency>
-  outputAmount: CurrencyAmount<Currency>
+  inputAmount: CurrencyAmountJSBI<CurrencyJSBI>
+  outputAmount: CurrencyAmountJSBI<CurrencyJSBI>
 }
 
 export interface RouteQuote extends GasCost {
@@ -53,8 +54,8 @@ export type RouteWithoutGasEstimate = Omit<
 
 export interface BestRoutes {
   gasEstimate: bigint
-  gasEstimateInUSD: CurrencyAmount<Currency>
+  gasEstimateInUSD: CurrencyAmountJSBI<CurrencyJSBI>
   routes: Route[]
-  inputAmount: CurrencyAmount<Currency>
-  outputAmount: CurrencyAmount<Currency>
+  inputAmount: CurrencyAmountJSBI<CurrencyJSBI>
+  outputAmount: CurrencyAmountJSBI<CurrencyJSBI>
 }

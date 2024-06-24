@@ -1,5 +1,6 @@
 import { ChainId } from '../../../chains/src'
-import { BigintIsh, Currency } from '@pancakeswap/sdk'
+import { BigintIsh, Currency, Token } from '@pancakeswap/sdk'
+import { Currency as CurrencyJSBI, Token as TokenJSBI } from '@cryptoalgebra/swapx-sdk'
 import memoize from 'lodash/memoize.js'
 import { Address } from 'viem'
 
@@ -15,8 +16,8 @@ import { parseCurrency, serializeCurrency } from '../../utils/transformer'
 export type { GetV3PoolsParams as GetV3CandidatePoolsParams }
 
 export type GetV3PoolsParams = {
-  currencyA?: Currency
-  currencyB?: Currency
+  currencyA?: Currency | CurrencyJSBI
+  currencyB?: Currency | CurrencyJSBI
 
   // V3 subgraph provider
   subgraphProvider?: SubgraphProvider
@@ -52,8 +53,14 @@ export const v3PoolsOnChainProviderFactory = <P extends GetV3PoolsParams = GetV3
   tvlReferenceProvider: (params: P) => Promise<V3PoolTvlReference[]>,
 ) => {
   return async function getV3PoolsWithTvlFromOnChain(params: P): Promise<V3PoolWithTvl[]> {
-    const { currencyA, currencyB, pairs: providedPairs, onChainProvider, blockNumber } = params
-    const pairs = providedPairs || getPairCombinations(currencyA, currencyB)
+    let { currencyA, currencyB, pairs: providedPairs, onChainProvider, blockNumber } = params
+
+    if (currencyA instanceof TokenJSBI && currencyB instanceof TokenJSBI && currencyA.symbol && currencyB.symbol) {
+      currencyA = new Token(currencyA.chainId, currencyA.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+      currencyB = new Token(currencyB.chainId, currencyB.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+    }
+
+    const pairs = providedPairs || getPairCombinations(currencyA as Currency, currencyB as Currency)
 
     const [fromOnChain, tvlReference] = await Promise.allSettled([
       getV3PoolsWithoutTicksOnChain(pairs, onChainProvider, blockNumber),
@@ -79,8 +86,14 @@ export const v3PoolsOnChainProviderFactory = <P extends GetV3PoolsParams = GetV3
 }
 
 export const getV3PoolsWithTvlFromOnChain = v3PoolsOnChainProviderFactory((params: GetV3PoolsParams) => {
-  const { currencyA, currencyB, pairs: providedPairs, subgraphProvider } = params
-  const pairs = providedPairs || getPairCombinations(currencyA, currencyB)
+  let { currencyA, currencyB, pairs: providedPairs, subgraphProvider } = params 
+  
+  if (currencyA instanceof TokenJSBI && currencyB instanceof TokenJSBI && currencyA.symbol && currencyB.symbol) {
+    currencyA = new Token(currencyA.chainId, currencyA.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+    currencyB = new Token(currencyB.chainId, currencyB.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+  }
+
+  const pairs = providedPairs || getPairCombinations(currencyA as Currency, currencyB as Currency)
   return getV3PoolSubgraph({ provider: subgraphProvider, pairs })
 })
 
@@ -119,10 +132,14 @@ export function createGetV3CandidatePools<T = any>(
   const getV3PoolsWithFallbacks = createAsyncCallWithFallbacks(defaultGetV3Pools, options)
 
   return async function getV3Pools(params: GetV3PoolsParams & T) {
-    const { currencyA, currencyB } = params
+    let { currencyA, currencyB } = params
+    if (currencyA instanceof TokenJSBI && currencyB instanceof TokenJSBI && currencyA.symbol && currencyB.symbol) {
+      currencyA = new Token(currencyA.chainId, currencyA.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+      currencyB = new Token(currencyB.chainId, currencyB.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+    }
     const pools = await getV3PoolsWithFallbacks(params)
 
-    return v3PoolTvlSelector(currencyA, currencyB, pools)
+    return v3PoolTvlSelector(currencyA as Currency, currencyB as Currency, pools)
   }
 }
 

@@ -1,12 +1,12 @@
-import { Currency, Pair, Price, Token } from '@pancakeswap/sdk'
-import { computePoolAddress } from '@cryptoalgebra/swapx-sdk'
+import { Currency, Pair, Price } from '@pancakeswap/sdk'
+import { computePoolAddress, Token as TokenJSBI } from '@cryptoalgebra/swapx-sdk'
 import { Pool as SDKV3Pool } from '@pancakeswap/v3-sdk'
 import memoize from 'lodash/memoize.js'
 import { Address, keccak256, encodePacked, getCreate2Address } from 'viem'
 
 import { Pool, PoolType, StablePool, V2Pool, V3Pool } from '../types'
 
-export function computePairAddress(token0: Token, token1: Token, isStable: boolean) {
+export function computePairAddress(token0: TokenJSBI, token1: TokenJSBI, isStable: boolean) {
   const [_token0, _token1] = token0.sortsBefore(token1) ? [token0, token1] : [token1, token0]
   const salt = keccak256(
     encodePacked(['address', 'address', 'bool'], [_token0.address as Address, _token1.address as Address, isStable])

@@ -1,4 +1,5 @@
-import { BigintIsh, Currency, CurrencyAmount, Price, ZERO } from '@pancakeswap/sdk'
+import { BigintIsh, Currency, CurrencyAmount, Price, Token, ZERO } from '@pancakeswap/sdk'
+import { Currency as CurrencyJSBI, Token as TokenJSBI } from '@cryptoalgebra/swapx-sdk'
 import { formatPrice } from '../../../utils/formatFractions'
 
 import { WithFallbackOptions, createAsyncCallWithFallbacks } from '../../../utils/withFallback'
@@ -12,8 +13,8 @@ import { getV2PoolSubgraph } from './subgraphPoolProviders'
 import { Address } from 'viem'
 
 export type GetV2PoolsParams = {
-  currencyA?: Currency
-  currencyB?: Currency
+  currencyA?: Currency | CurrencyJSBI
+  currencyB?: Currency | CurrencyJSBI
   onChainProvider?: OnChainProvider
   blockNumber?: BigintIsh
 
@@ -37,10 +38,14 @@ export function createV2PoolsProviderByCommonTokenPrices<T = any>(getCommonToken
     blockNumber,
     ...rest
   }: GetV2PoolsParams & T) {
-    const pairs = providedPairs || getPairCombinations(currencyA, currencyB)
+    if (currencyA instanceof TokenJSBI && currencyB instanceof TokenJSBI && currencyA.symbol && currencyB.symbol) {
+      currencyA = new Token(currencyA.chainId, currencyA.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+      currencyB = new Token(currencyB.chainId, currencyB.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+    }
+    const pairs = providedPairs || getPairCombinations(currencyA as Currency, currencyB as Currency)
     const [poolsFromOnChain, baseTokenUsdPrices] = await Promise.all([
       getV2PoolsOnChain(pairs, onChainProvider, blockNumber),
-      getCommonTokenPrices({ currencyA, currencyB, ...(rest as T) }),
+      getCommonTokenPrices({ currencyA: currencyA as Currency, currencyB: currencyB as Currency, ...(rest as T) }),
     ])
 
     if (!poolsFromOnChain) {
@@ -97,9 +102,13 @@ export function createGetV2CandidatePools<T = any>(
   const getV2PoolsWithFallbacks = createAsyncCallWithFallbacks(defaultGetV2Pools, options)
 
   return async function getV2Pools(params: GetV2PoolsParams & T) {
-    const { currencyA, currencyB } = params
+    let { currencyA, currencyB } = params
+    if (currencyA instanceof TokenJSBI && currencyB instanceof TokenJSBI && currencyA.symbol && currencyB.symbol) {
+      currencyA = new Token(currencyA.chainId, currencyA.address, currencyA.decimals, currencyA.symbol, currencyA.name)
+      currencyB = new Token(currencyB.chainId, currencyB.address, currencyB.decimals, currencyB.symbol, currencyB.name)
+    }
     const pools = await getV2PoolsWithFallbacks(params)
-    return v2PoolTvlSelector(currencyA, currencyB, pools)
+    return v2PoolTvlSelector(currencyA as Currency, currencyB as Currency, pools)
   }
 }
 

@@ -1,8 +1,9 @@
-import { Currency, CurrencyAmount, Native, Token, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { Currency, CurrencyAmount, Token, Native } from '@pancakeswap/sdk'
+import { ChainId } from '../chains/src'
+import { holeskyTokens } from '../constants/holeskyTokens'
 
 export function wrappedCurrency(currency: Currency | undefined, chainId: ChainId): Token | undefined {
-  return currency?.isNative ? WNATIVE[chainId] : currency?.isToken ? currency : undefined
+  return currency?.isNative ? holeskyTokens.weth : currency?.isToken ? currency : undefined
 }
 
 export function wrappedCurrencyAmount(
@@ -18,6 +19,6 @@ export function unwrappedToken(token: Currency): Currency {
     return token
   }
 
-  if (token.equals(WNATIVE[token.chainId as ChainId])) return Native.onChain(token.chainId)
+  if (token.equals(holeskyTokens.weth)) return Native.onChain(token.chainId)
   return token
 }

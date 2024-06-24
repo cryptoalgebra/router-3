@@ -1,5 +1,5 @@
 import { BigintIsh, Currency, CurrencyAmount, Price } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../chains/src'
 import tryParseAmount from '../utils/tryParseAmount'
 import sum from 'lodash/sum.js'
 
@@ -89,7 +89,7 @@ export async function createGasModel({
 
     for (const pool of pools) {
       const { type } = pool
-      if (isV2Pool(pool)) {
+      if (isV2Pool(pool) || isStablePool(pool)) {
         if (!poolTypeSet.has(type)) {
           baseGasUse += BASE_SWAP_COST_V2
           poolTypeSet.add(type)
@@ -108,15 +108,15 @@ export async function createGasModel({
         continue
       }
 
-      if (isStablePool(pool)) {
-        if (!poolTypeSet.has(type)) {
-          baseGasUse += BASE_SWAP_COST_STABLE_SWAP
-          poolTypeSet.add(type)
-          continue
-        }
-        baseGasUse += COST_PER_EXTRA_HOP_STABLE_SWAP
-        continue
-      }
+      // if (isStablePool(pool)) {
+      //   if (!poolTypeSet.has(type)) {
+      //     baseGasUse += BASE_SWAP_COST_STABLE_SWAP
+      //     poolTypeSet.add(type)
+      //     continue
+      //   }
+      //   baseGasUse += COST_PER_EXTRA_HOP_STABLE_SWAP
+      //   continue
+      // }
     }
 
     const tickGasUse = COST_PER_INIT_TICK(chainId) * totalInitializedTicksCrossed

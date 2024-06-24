@@ -18,4 +18,5 @@ export {
   maximumAmountIn,
   metric,
   minimumAmountOut,
+  getPriceImpact
 } from './utils'

@@ -553,6 +553,19 @@ export const pancakePairABI = [
   },
   {
     inputs: [],
+    name: 'stable',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'pure',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'sync',
     outputs: [],
     stateMutability: 'nonpayable',

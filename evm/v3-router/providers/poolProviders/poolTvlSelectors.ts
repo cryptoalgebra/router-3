@@ -1,11 +1,12 @@
-import { Currency, Token, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { Currency, Token } from '@pancakeswap/sdk'
+import { ChainId } from '../../../chains/src'
 import { Address } from 'viem'
 
 import { PoolSelectorConfig, V2PoolWithTvl, V3PoolWithTvl, WithTvl } from '../../types'
 import { BASES_TO_CHECK_TRADES_AGAINST } from '../../../constants'
 import { getV2PoolSelectorConfig, getV3PoolSelectorConfig } from '../../utils/getPoolSelectorConfig'
 import { getPoolAddress as getPoolAddressUtil } from '../../utils'
+import { holeskyTokens } from '../../../constants/holeskyTokens'
 
 const sortByTvl = (a: WithTvl, b: WithTvl) => (a.tvlUSD >= b.tvlUSD ? -1 : 1)
 
@@ -102,7 +103,7 @@ function poolSelectorFactory<P extends WithTvl>({
 
     addToPoolSet(top2DirectPools)
 
-    const nativeToken = WNATIVE[chainId as ChainId]
+    const nativeToken = holeskyTokens.weth
     const top2EthBaseTokenPool = nativeToken
       ? poolsFromSubgraph
           .filter((subgraphPool) => {

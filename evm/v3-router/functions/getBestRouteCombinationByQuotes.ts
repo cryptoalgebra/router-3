@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { Currency, CurrencyAmount, TradeType } from '@pancakeswap/sdk'
 import flatMap from 'lodash/flatMap.js'
 import mapValues from 'lodash/mapValues.js'
@@ -8,7 +8,7 @@ import Queue from 'mnemonist/queue.js'
 
 import { usdGasTokensByChain } from '../../constants'
 import { BestRoutes, L1ToL2GasCosts, RouteWithQuote } from '../types'
-import { getPoolAddress, isV2Pool, isV3Pool, logger } from '../utils'
+import { getPoolAddress, isStablePool, isV2Pool, isV3Pool, logger } from '../utils'
 
 interface Config {
   minSplits?: number
@@ -254,10 +254,12 @@ export function getBestSwapRouteBy(
                       if (isV2Pool(p)) {
                         return `V2 ${p.reserve0.currency.symbol}-${p.reserve1.currency.symbol}`
                       }
+                      if (isStablePool(p)) {
+                        return `Stable ${p.reserve0.currency.symbol}-${p.reserve1.currency.symbol}`
+                      }
                       if (isV3Pool(p)) {
                         return `V3 fee ${p.fee} ${p.token0.symbol}-${p.token1.symbol}`
                       }
-                      return `Stable ${p.balances.map((b) => b.currency).join('-')}`
                     })
                     .join(', ')} ${r.quote.toExact()}`,
               )

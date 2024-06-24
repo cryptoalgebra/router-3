@@ -9,6 +9,7 @@ import {
 } from '../constants'
 import { PoolSelectorConfig, PoolSelectorConfigChainMap, TokenPoolSelectorConfigChainMap } from '../types'
 import { mergePoolSelectorConfig } from './mergePoolSelectorConfig'
+import { Address } from 'viem'
 
 function poolSelectorConfigFactory(
   poolSelecorConfigMap: PoolSelectorConfigChainMap,
@@ -20,8 +21,8 @@ function poolSelectorConfigFactory(
       return DEFAULT_POOL_SELECTOR_CONFIG
     }
 
-    const additionalConfigA = tokenPoolSelectorConfigMap[chainId]?.[currencyA?.wrapped?.address || '0x']
-    const additionalConfigB = tokenPoolSelectorConfigMap[chainId]?.[currencyB?.wrapped?.address || '0x']
+    const additionalConfigA = tokenPoolSelectorConfigMap[chainId]?.[currencyA?.wrapped?.address as Address || '0x']
+    const additionalConfigB = tokenPoolSelectorConfigMap[chainId]?.[currencyB?.wrapped?.address as Address || '0x']
 
     return mergePoolSelectorConfig(
       mergePoolSelectorConfig(poolSelecorConfigMap[chainId], additionalConfigA),

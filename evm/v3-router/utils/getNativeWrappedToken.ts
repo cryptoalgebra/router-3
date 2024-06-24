@@ -1,6 +1,8 @@
-import { Token, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { Token } from '@pancakeswap/sdk'
+import { ChainId } from '../../chains/src'
+import { holeskyTokens } from '../../constants/holeskyTokens'
+
 
 export function getNativeWrappedToken(chainId: ChainId): Token | null {
-  return WNATIVE[chainId] ?? null
+  return holeskyTokens.weth ?? null
 }

@@ -3,7 +3,7 @@ import { formatPrice } from '../../../utils/formatFractions'
 
 import { WithFallbackOptions, createAsyncCallWithFallbacks } from '../../../utils/withFallback'
 import { getPairCombinations } from '../../functions'
-import { OnChainProvider, SubgraphProvider, V2PoolWithTvl } from '../../types'
+import { OnChainProvider, StablePoolWithTvl, SubgraphProvider, V2PoolWithTvl } from '../../types'
 import { getPoolAddress, logger } from '../../utils'
 import { CommonTokenPriceProvider, getCommonTokenPrices as defaultGetCommonTokenPrices } from '../getCommonTokenPrices'
 import { getV2PoolsOnChain } from './onChainPoolProviders'
@@ -58,7 +58,7 @@ export function createV2PoolsProviderByCommonTokenPrices<T = any>(getCommonToken
       })
     }
 
-    return poolsFromOnChain.map<V2PoolWithTvl>((pool) => {
+    return poolsFromOnChain.map<V2PoolWithTvl | StablePoolWithTvl>((pool) => {
       const getAmountUsd = (amount: CurrencyAmount<Currency>) => {
         if (amount.equalTo(ZERO)) {
           return 0
@@ -88,7 +88,7 @@ export const getV2PoolsWithTvlByCommonTokenPrices = createV2PoolsProviderByCommo
   v3SubgraphProvider?: SubgraphProvider
 }>(defaultGetCommonTokenPrices)
 
-type GetV2Pools<T = any> = (params: GetV2PoolsParams & T) => Promise<V2PoolWithTvl[]>
+type GetV2Pools<T = any> = (params: GetV2PoolsParams & T) => Promise<(V2PoolWithTvl | StablePoolWithTvl)[]>
 
 export function createGetV2CandidatePools<T = any>(
   defaultGetV2Pools: GetV2Pools<T>,

@@ -1,5 +1,5 @@
 import { TradeType } from '@pancakeswap/sdk'
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../chains/src'
 import { FeeAmount } from '@pancakeswap/v3-sdk'
 import { Address } from 'viem'
 import { z } from 'zod'
@@ -50,9 +50,8 @@ const zV3Pool = z
 const zStablePool = z
   .object({
     type: zPoolType,
-    balances: z.array(zCurrencyAmount),
-    amplifier: zBigNumber,
-    fee: z.string(),
+    reserve0: zCurrencyAmount,
+    reserve1: zCurrencyAmount,
   })
   .required()
 

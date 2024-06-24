@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../chains/src'
 import { Currency, Token } from '@pancakeswap/sdk'
 import type { Address } from 'viem'
 import flatMap from 'lodash/flatMap.js'

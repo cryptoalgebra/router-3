@@ -1,4 +1,4 @@
-import { ChainId } from '@pancakeswap/chains'
+import { ChainId } from '../../../chains/src'
 import { BigintIsh, Currency } from '@pancakeswap/sdk'
 import memoize from 'lodash/memoize.js'
 import { Address } from 'viem'
@@ -9,6 +9,7 @@ import { getV3PoolSubgraph } from './subgraphPoolProviders'
 import { getPairCombinations } from '../../functions'
 import { v3PoolTvlSelector } from './poolTvlSelectors'
 import { getV3PoolsWithoutTicksOnChain } from './onChainPoolProviders'
+import { parseCurrency, serializeCurrency } from '../../utils/transformer'
 
 // @deprecated
 export type { GetV3PoolsParams as GetV3CandidatePoolsParams }
@@ -96,10 +97,6 @@ const createFallbackTvlRefGetter = () => {
     }
 
     throw 'E'
-    // const res = await fetch(`https://routing-api.pancakeswap.com/v0/v3-pools-tvl/${currencyA.chainId}`)
-    // const refs: V3PoolTvlReference[] = await res.json()
-    // cache.set(currencyA.chainId, refs)
-    // return refs
   }
 }
 

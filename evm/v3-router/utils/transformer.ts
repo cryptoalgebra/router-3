@@ -4,7 +4,7 @@ import { Address } from 'viem'
 import { ADDRESS_ZERO } from '@pancakeswap/v3-sdk'
 import { Pool, PoolType, Route, SmartRouterTrade, StablePool, V2Pool, V3Pool } from '../types'
 import { isStablePool, isV2Pool, isV3Pool } from './pool'
-import { Native } from '@cryptoalgebra/integral-sdk'
+import { Native, CurrencyAmount as CurrencyAmountJSBI } from '@cryptoalgebra/swapx-sdk'
 
 const ONE_HUNDRED = BigInt(100)
 
@@ -103,19 +103,19 @@ export function serializeRoute(route: Route): SerializedRoute {
     ...route,
     pools: route.pools.map(serializePool),
     path: route.path.map(serializeCurrency),
-    inputAmount: serializeCurrencyAmount(route.inputAmount),
-    outputAmount: serializeCurrencyAmount(route.outputAmount),
+    inputAmount: serializeCurrencyAmount(CurrencyAmount.fromRawAmount(route.inputAmount.currency as Currency, route.inputAmount.quotient.toString())),
+    outputAmount: serializeCurrencyAmount(CurrencyAmount.fromRawAmount(route.outputAmount.currency as Currency, route.outputAmount.quotient.toString())),
   }
 }
 
 export function serializeTrade(trade: SmartRouterTrade<TradeType>): SerializedTrade {
   return {
     ...trade,
-    inputAmount: serializeCurrencyAmount(trade.inputAmount),
-    outputAmount: serializeCurrencyAmount(trade.outputAmount),
+    inputAmount: serializeCurrencyAmount(CurrencyAmount.fromRawAmount(trade.inputAmount.currency as Currency, trade.inputAmount.quotient.toString())),
+    outputAmount: serializeCurrencyAmount(CurrencyAmount.fromRawAmount(trade.outputAmount.currency as Currency, trade.outputAmount.quotient.toString())),
     routes: trade.routes.map(serializeRoute),
     gasEstimate: trade.gasEstimate.toString(),
-    gasEstimateInUSD: serializeCurrencyAmount(trade.gasEstimateInUSD),
+    gasEstimateInUSD: serializeCurrencyAmount(CurrencyAmount.fromRawAmount(trade.gasEstimateInUSD.currency as Currency, trade.gasEstimateInUSD.quotient.toString())),
   }
 }
 
@@ -156,22 +156,27 @@ export function parsePool(chainId: ChainId, pool: SerializedPool): Pool {
 }
 
 export function parseRoute(chainId: ChainId, route: SerializedRoute): Route {
+  const parsedInput = parseCurrencyAmount(chainId, route.inputAmount)
+  const parsedOutput = parseCurrencyAmount(chainId, route.outputAmount)
   return {
     ...route,
     pools: route.pools.map((p) => parsePool(chainId, p)),
     path: route.path.map((c) => parseCurrency(chainId, c)),
-    inputAmount: parseCurrencyAmount(chainId, route.inputAmount),
-    outputAmount: parseCurrencyAmount(chainId, route.outputAmount),
+    inputAmount: CurrencyAmountJSBI.fromRawAmount(parsedInput.currency as Currency, parsedInput.quotient.toString()),
+    outputAmount: CurrencyAmountJSBI.fromRawAmount(parsedOutput.currency as Currency, parsedOutput.quotient.toString()),
   }
 }
 
 export function parseTrade(chainId: ChainId, trade: SerializedTrade): SmartRouterTrade<TradeType> {
+  const parsedInput = parseCurrencyAmount(chainId, trade.inputAmount)
+  const parsedOutput = parseCurrencyAmount(chainId, trade.outputAmount)
+  const parsedGasEstimateInUSD = parseCurrencyAmount(chainId, trade.gasEstimateInUSD)
   return {
     ...trade,
-    inputAmount: parseCurrencyAmount(chainId, trade.inputAmount),
-    outputAmount: parseCurrencyAmount(chainId, trade.outputAmount),
+    inputAmount: CurrencyAmountJSBI.fromRawAmount(parsedInput.currency as Currency, parsedInput.quotient.toString()),
+    outputAmount: CurrencyAmountJSBI.fromRawAmount(parsedOutput.currency as Currency, parsedOutput.quotient.toString()),
     routes: trade.routes.map((r) => parseRoute(chainId, r)),
     gasEstimate: BigInt(trade.gasEstimate),
-    gasEstimateInUSD: parseCurrencyAmount(chainId, trade.gasEstimateInUSD),
+    gasEstimateInUSD: CurrencyAmountJSBI.fromRawAmount(parsedGasEstimateInUSD.currency as Currency, parsedGasEstimateInUSD.quotient.toString()),
   }
 }

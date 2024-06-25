@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { ChainId } from '../../chains/src'
 import { Currency, CurrencyAmount, TradeType } from '@pancakeswap/sdk'
+import { CurrencyAmount as CurrencyAmountJSBI } from '@cryptoalgebra/swapx-sdk'
 import flatMap from 'lodash/flatMap.js'
 import mapValues from 'lodash/mapValues.js'
 import FixedReverseHeap from 'mnemonist/fixed-reverse-heap.js'
@@ -100,24 +101,24 @@ export function getBestRouteCombinationByQuotes(
   )
 
   const { routes, quote: quoteAmount, estimatedGasUsed, estimatedGasUsedUSD } = swapRoute
-  const quote = CurrencyAmount.fromRawAmount(quoteCurrency, quoteAmount.quotient)
+  const quoteJSBI = CurrencyAmountJSBI.fromRawAmount(quoteCurrency, quoteAmount.quotient.toString())
+  const amountJSBI = CurrencyAmountJSBI.fromRawAmount(amount.currency, amount.quotient.toString())
   const isExactIn = tradeType === TradeType.EXACT_INPUT
   return {
     routes: routes.map(({ type, amount: routeAmount, quote: routeQuoteAmount, pools, path, percent }) => {
-      const routeQuote = CurrencyAmount.fromRawAmount(quoteCurrency, routeQuoteAmount.quotient)
       return {
         percent,
         type,
         pools,
         path,
-        inputAmount: isExactIn ? routeAmount : routeQuote,
-        outputAmount: isExactIn ? routeQuote : routeAmount,
+        inputAmount: isExactIn ? CurrencyAmountJSBI.fromRawAmount(routeAmount.currency, routeAmount.quotient.toString()) : CurrencyAmountJSBI.fromRawAmount(routeQuoteAmount.currency, routeQuoteAmount.quotient.toString()),
+        outputAmount: isExactIn ? CurrencyAmountJSBI.fromRawAmount(routeQuoteAmount.currency, routeQuoteAmount.quotient.toString()) : CurrencyAmountJSBI.fromRawAmount(routeAmount.currency, routeAmount.quotient.toString()),
       }
     }),
     gasEstimate: estimatedGasUsed,
-    gasEstimateInUSD: estimatedGasUsedUSD,
-    inputAmount: isExactIn ? amount : quote,
-    outputAmount: isExactIn ? quote : amount,
+    gasEstimateInUSD: CurrencyAmountJSBI.fromRawAmount(estimatedGasUsedUSD.currency, estimatedGasUsedUSD.quotient.toString()),
+    inputAmount: isExactIn ? amountJSBI : quoteJSBI,
+    outputAmount: isExactIn ? quoteJSBI : amountJSBI,
   }
 }
 

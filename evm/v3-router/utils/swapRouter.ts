@@ -1,27 +1,26 @@
 import { encodeFunctionData, Hex, Address } from 'viem'
-import { Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress, WNATIVE } from '@pancakeswap/sdk'
-import { ChainId } from '../../chains/src'
-import { FeeOptions, MethodParameters, Payments, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
+import { Currency, CurrencyAmount, Percent, Token, TradeType, validateAndParseAddress } from '@pancakeswap/sdk'
+import { Percent as PercentJSBI } from '@cryptoalgebra/swapx-sdk'
+import { FeeOptions, MethodParameters, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
 import invariant from 'tiny-invariant'
 
 import { swapRouter02Abi } from '../../abis/algebra/ISwapRouter02'
 import { ADDRESS_THIS, MSG_SENDER } from '../../constants'
 import { ApproveAndCall, ApprovalTypes, CondensedAddLiquidityOptions } from './approveAndCall'
-import { SmartRouterTrade, V3Pool, BaseRoute, RouteType, StablePool, PoolType } from '../types'
+import { SmartRouterTrade, BaseRoute, RouteType, PoolType } from '../types'
 import { MulticallExtended, Validation } from './multicallExtended'
 import { PaymentsExtended } from './paymentsExtended'
 import { encodeMixedRouteToPath } from './encodeMixedRouteToPath'
 import { partitionMixedRouteByProtocol } from './partitionMixedRouteByProtocol'
-import { maximumAmountIn, minimumAmountOut } from './maximumAmount'
 import { isStablePool, isV2Pool, isV3Pool } from './pool'
 import { buildBaseRoute } from './route'
 import { getOutputOfPools } from './getOutputOfPools'
 import { getPriceImpact } from './getPriceImpact'
-import { ADDRESS_ZERO } from '@cryptoalgebra/integral-sdk'
 import { xLayerTestnetTokens } from '../../constants/tokens'
+import { maximumAmountInBN, minimumAmountOutBN } from './maximumAmount'
 
 const ZERO = BigInt(0)
-const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
+const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new PercentJSBI(50, 100)
 
 /**
  * Options for producing the arguments to send calls to the router.
@@ -30,7 +29,7 @@ export interface SwapOptions {
   /**
    * How much the execution price is allowed to move unfavorably from the trade execution price.
    */
-  slippageTolerance: Percent
+  slippageTolerance: Percent | PercentJSBI
 
   /**
    * The account that should receive the output. If omitted, output is sent to msg.sender.
@@ -88,8 +87,8 @@ export abstract class SwapRouter {
     routerMustCustody: boolean,
     performAggregatedSlippageCheck: boolean,
   ): Hex {
-    const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance).quotient
-    const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance).quotient
+    const amountIn: bigint = maximumAmountInBN(trade, options.slippageTolerance).quotient
+    const amountOut: bigint = minimumAmountOutBN(trade, options.slippageTolerance).quotient
 
     // V2 trade should have only one route
     const route = trade.routes[0]
@@ -150,9 +149,9 @@ export abstract class SwapRouter {
     const calldatas: Hex[] = []
 
     for (const route of trade.routes) {
-      const { inputAmount, outputAmount, pools, path } = route
-      const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance, inputAmount).quotient
-      const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance, outputAmount).quotient
+      const { inputAmount: inputAmountJSBI, outputAmount: outputAmountJSBI, pools, path } = route
+      const amountIn: bigint = maximumAmountInBN(trade, options.slippageTolerance, inputAmountJSBI).quotient
+      const amountOut: bigint = minimumAmountOutBN(trade, options.slippageTolerance, outputAmountJSBI).quotient
 
       // flag for whether the trade is single hop or not
       const singleHop = pools.length === 1
@@ -201,7 +200,10 @@ export abstract class SwapRouter {
         }
       } else {
         const pathStr = encodeMixedRouteToPath(
-          { ...route, input: inputAmount.currency, output: outputAmount.currency },
+          { ...route, 
+            input: new Token(inputAmountJSBI.currency.chainId, inputAmountJSBI.currency.wrapped.address, inputAmountJSBI.currency.decimals, inputAmountJSBI.currency.symbol || "", inputAmountJSBI.currency.name),
+            output: new Token(outputAmountJSBI.currency.chainId, outputAmountJSBI.currency.wrapped.address, outputAmountJSBI.currency.decimals, outputAmountJSBI.currency.symbol || "", outputAmountJSBI.currency.name),
+          },
           trade.tradeType === TradeType.EXACT_OUTPUT,
           true
         )
@@ -263,9 +265,9 @@ export abstract class SwapRouter {
     const isExactIn = trade.tradeType === TradeType.EXACT_INPUT
 
     for (const route of trade.routes) {
-      const { inputAmount, outputAmount, pools } = route
-      const amountIn: bigint = maximumAmountIn(trade, options.slippageTolerance, inputAmount).quotient
-      const amountOut: bigint = minimumAmountOut(trade, options.slippageTolerance, outputAmount).quotient
+      const { inputAmount: inputAmountJSBI, outputAmount: outputAmountJSBI, pools } = route
+      const amountIn: bigint = maximumAmountInBN(trade, options.slippageTolerance, inputAmountJSBI).quotient
+      const amountOut: bigint = minimumAmountOutBN(trade, options.slippageTolerance, outputAmountJSBI).quotient
 
       // flag for whether the trade is single hop or not
       const singleHop = pools.length === 1
@@ -293,8 +295,8 @@ export abstract class SwapRouter {
               {
                 ...trade,
                 routes: [route],
-                inputAmount,
-                outputAmount,
+                inputAmount: inputAmountJSBI,
+                outputAmount: outputAmountJSBI,
               },
               options,
               routerMustCustody,
@@ -308,8 +310,8 @@ export abstract class SwapRouter {
               {
                 ...trade,
                 routes: [route],
-                inputAmount,
-                outputAmount,
+                inputAmount: inputAmountJSBI,
+                outputAmount: outputAmountJSBI,
               },
               options,
               routerMustCustody,
@@ -327,7 +329,7 @@ export abstract class SwapRouter {
         }
 
         let outputToken
-        let inputToken = inputAmount.currency.wrapped
+        let inputToken = new Token(inputAmountJSBI.currency.chainId, inputAmountJSBI.currency.wrapped.address, inputAmountJSBI.currency.decimals, inputAmountJSBI.currency.symbol || "", inputAmountJSBI.currency.name)
 
         for (let i = 0; i < sections.length; i++) {
           const section = sections[i]
@@ -486,7 +488,7 @@ export abstract class SwapRouter {
     // encode permit if necessary
     if (options.inputTokenPermit) {
       invariant(sampleTrade.inputAmount.currency.isToken, 'NON_TOKEN_PERMIT')
-      calldatas.push(SelfPermit.encodePermit(sampleTrade.inputAmount.currency, options.inputTokenPermit))
+      calldatas.push(SelfPermit.encodePermit(sampleTrade.inputAmount.currency as Token, options.inputTokenPermit))
     }
 
     for (const trade of trades) {
@@ -513,21 +515,21 @@ export abstract class SwapRouter {
       }
     }
 
-    const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(sampleTrade.inputAmount.currency, 0)
-    const ZERO_OUT: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(sampleTrade.outputAmount.currency, 0)
+    const ZERO_IN: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(sampleTrade.inputAmount.currency as Currency, 0)
+    const ZERO_OUT: CurrencyAmount<Currency> = CurrencyAmount.fromRawAmount(sampleTrade.outputAmount.currency as Currency, 0)
 
     const minAmountOut: CurrencyAmount<Currency> = trades.reduce(
-      (sum, trade) => sum.add(minimumAmountOut(trade, options.slippageTolerance)),
+      (sum, trade) => sum.add(minimumAmountOutBN(trade, options.slippageTolerance)),
       ZERO_OUT,
     )
 
     const quoteAmountOut: CurrencyAmount<Currency> = trades.reduce(
-      (sum, trade) => sum.add(trade.outputAmount),
+      (sum, trade) => sum.add(CurrencyAmount.fromRawAmount(trade.outputAmount.currency as Currency, trade.outputAmount.quotient.toString())),
       ZERO_OUT,
     )
 
     const totalAmountIn: CurrencyAmount<Currency> = trades.reduce(
-      (sum, trade) => sum.add(maximumAmountIn(trade, options.slippageTolerance)),
+      (sum, trade) => sum.add(maximumAmountInBN(trade, options.slippageTolerance)),
       ZERO_IN,
     )
 
@@ -566,7 +568,7 @@ export abstract class SwapRouter {
       } else {
         calldatas.push(
           PaymentsExtended.encodeSweepToken(
-            sampleTrade.outputAmount.currency.wrapped,
+            sampleTrade.outputAmount.currency.wrapped as Token,
             minAmountOut.quotient,
             options.recipient,
             options.fee,
@@ -664,9 +666,10 @@ export abstract class SwapRouter {
       useFullPrecision: false,
     })
 
+    const slippageBn = new Percent(BigInt(options.slippageTolerance.numerator.toString()), BigInt(options.slippageTolerance.denominator.toString()))
     // encode NFTManager add liquidity
     calldatas.push(
-      ApproveAndCall.encodeAddLiquidity(position, minimalPosition, addLiquidityOptions, options.slippageTolerance),
+      ApproveAndCall.encodeAddLiquidity(position, minimalPosition, addLiquidityOptions, slippageBn),
     )
 
     // sweep remaining tokens

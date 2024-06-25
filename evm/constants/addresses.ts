@@ -8,13 +8,13 @@ export const ALGEBRA_POOL_DEPLOYER: Address =
 
 /* V3 */
 export const ALGEBRA_QUOTER: Address =
-    '0x37A4950b4ea0C46596404895c5027B088B0e70e7'; // in use
+    '0x37A4950b4ea0C46596404895c5027B088B0e70e7';
 
 export const ALGEBRA_QUOTER_V2: Address =
     '0x1B3B62B519a60E8927d4FfbB54681871e1Bb6F11';
 
 export const ALGEBRA_ROUTER: Address =
-    '0x0f460A2b3E8ba1Cc4D33E47f207EA03B37A286a7'; // in use
+    '0x0f460A2b3E8ba1Cc4D33E47f207EA03B37A286a7';
 
 /* V2 */
 export const PAIR_FACTORY_UPGRADEABLE: Address =

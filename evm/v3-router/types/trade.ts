@@ -1,4 +1,5 @@
 import { BigintIsh, Currency, CurrencyAmount, TradeType } from '@pancakeswap/sdk'
+import { Currency as CurrencyJSBI, CurrencyAmount as CurrencyAmountJSBI } from '@cryptoalgebra/swapx-sdk'
 import { AbortControl } from '../../utils/abortControl'
 
 import { Route } from './route'
@@ -7,14 +8,15 @@ import { PoolType } from './pool'
 
 export interface SmartRouterTrade<TTradeType extends TradeType> {
   tradeType: TTradeType
-  inputAmount: CurrencyAmount<Currency>
-  outputAmount: CurrencyAmount<Currency>
+  inputAmount: CurrencyAmountJSBI<CurrencyJSBI>
+  outputAmount: CurrencyAmountJSBI<CurrencyJSBI>
 
   // From routes we know how many splits and what percentage does each split take
   routes: Route[]
 
   gasEstimate: bigint
-  gasEstimateInUSD: CurrencyAmount<Currency>
+  gasEstimateInUSD: CurrencyAmountJSBI<CurrencyJSBI>
+
   blockNumber?: number
 }
 

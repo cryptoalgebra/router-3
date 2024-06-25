@@ -3,7 +3,6 @@ import { Token } from '@pancakeswap/sdk'
 
 import { BaseRoute, Pool } from '../types'
 import { getOutputCurrency, isStablePool, isV2Pool, isV3Pool } from './pool'
-import { V2_FEE_PATH_PLACEHOLDER } from '../../constants'
 
 /**
  * Converts a route to a hex encoded path

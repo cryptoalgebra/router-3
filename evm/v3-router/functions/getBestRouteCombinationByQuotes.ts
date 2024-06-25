@@ -112,7 +112,7 @@ export function getBestRouteCombinationByQuotes(
         pools,
         path,
         inputAmount: isExactIn ? CurrencyAmountJSBI.fromRawAmount(routeAmount.currency, routeAmount.quotient.toString()) : CurrencyAmountJSBI.fromRawAmount(routeQuoteAmount.currency, routeQuoteAmount.quotient.toString()),
-        outputAmount: isExactIn ? CurrencyAmountJSBI.fromRawAmount(routeAmount.currency, routeAmount.quotient.toString()) : CurrencyAmountJSBI.fromRawAmount(routeQuoteAmount.currency, routeQuoteAmount.quotient.toString()),
+        outputAmount: isExactIn ? CurrencyAmountJSBI.fromRawAmount(routeQuoteAmount.currency, routeQuoteAmount.quotient.toString()) : CurrencyAmountJSBI.fromRawAmount(routeAmount.currency, routeAmount.quotient.toString()),
       }
     }),
     gasEstimate: estimatedGasUsed,

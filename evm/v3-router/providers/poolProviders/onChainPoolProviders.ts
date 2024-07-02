@@ -8,7 +8,7 @@ import { pancakePairABI } from '../../../abis/IPancakePair'
 import { OnChainProvider, Pool, PoolType, StablePool, V2Pool, V3Pool } from '../../types'
 import { computeV2PoolAddress, computeV3CustomPoolAddress, computeV3PoolAddress } from '../../utils'
 import { PoolMeta, V3PoolMeta } from './internalTypes'
-import { ALGEBRA_POOL_DEPLOYER, CUSTOM_POOL_BASE, CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
+import { ALGEBRA_POOL_DEPLOYER, CUSTOM_POOL_BASE, CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER, CUSTOM_POOL_DEPLOYER_VOLUME_FEE, POOL_INIT_CODE_HASH } from '../../../constants/addresses'
 
 export const getV2PoolsOnChain = createOnChainPoolFactory<V2Pool | StablePool, PoolMeta>({
   abi: pancakePairABI,
@@ -52,6 +52,7 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<V3Pool, V3
     return [
       CUSTOM_POOL_DEPLOYER_BLANK,
       CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+      CUSTOM_POOL_DEPLOYER_VOLUME_FEE,
       CUSTOM_POOL_BASE
     ].map((deployer) => ({
       address: (deployer === CUSTOM_POOL_BASE ? computeV3PoolAddress({

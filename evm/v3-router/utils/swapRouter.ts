@@ -3,7 +3,6 @@ import { Currency, CurrencyAmount, Percent, TradeType, validateAndParseAddress }
 import { FeeOptions, MethodParameters, PermitOptions, Position, SelfPermit, toHex } from '@pancakeswap/v3-sdk'
 import invariant from 'tiny-invariant'
 
-import { ADDRESS_THIS, MSG_SENDER } from '../../constants'
 import { SmartRouterTrade, V3Pool, RouteType } from '../types'
 import { MulticallExtended, Validation } from './multicallExtended'
 import { PaymentsExtended } from './paymentsExtended'
@@ -11,6 +10,7 @@ import { encodeMixedRouteToPath } from './encodeMixedRouteToPath'
 import { maximumAmountIn, minimumAmountOut } from './maximumAmount'
 import { getPriceImpact } from './getPriceImpact'
 import { algebraRouterABI } from '../../abis/algebra/algebraRouter'
+import { ADDRESS_ZERO } from "@cryptoalgebra/custom-pools-sdk";
 
 const ZERO = BigInt(0)
 const REFUND_ETH_PRICE_IMPACT_THRESHOLD = new Percent(BigInt(50), BigInt(100))
@@ -27,7 +27,7 @@ export interface SwapOptions {
   /**
    * The account that should receive the output. If omitted, output is sent to msg.sender.
    */
-  recipient?: Address
+  recipient: Address
 
   /**
    * Either deadline (when the transaction expires, in epoch seconds), or previousBlockhash.
@@ -137,7 +137,6 @@ export abstract class SwapRouter {
     trade: SmartRouterTrade<TradeType>,
     options: SwapOptions,
     routerMustCustody: boolean,
-    performAggregatedSlippageCheck: boolean,
   ): Hex[] {
     const calldatas: Hex[] = []
 
@@ -149,11 +148,7 @@ export abstract class SwapRouter {
       // flag for whether the trade is single hop or not
       const singleHop = pools.length === 1
 
-      const recipient = routerMustCustody
-        ? ADDRESS_THIS
-        : typeof options.recipient === 'undefined'
-        ? MSG_SENDER
-        : validateAndParseAddress(options.recipient)
+      const recipient = routerMustCustody ? ADDRESS_ZERO : validateAndParseAddress(options.recipient)
 
       if (singleHop) {
         if (trade.tradeType === TradeType.EXACT_INPUT) {
@@ -162,7 +157,7 @@ export abstract class SwapRouter {
             tokenOut: path[1].wrapped.address as Address,
             recipient,
             amountIn,
-            amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
+            amountOutMinimum: amountOut,
             limitSqrtPrice: BigInt(0),
             deployer: (pools[0] as V3Pool).deployer as Address,
             deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
@@ -207,7 +202,7 @@ export abstract class SwapRouter {
             path: pathStr,
             recipient,
             amountIn,
-            amountOutMinimum: performAggregatedSlippageCheck ? BigInt(0) : amountOut,
+            amountOutMinimum: amountOut,
             deployer: (pools[0] as V3Pool).deployer as Address,
             deadline: BigInt(options.deadlineOrPreviousBlockhash || 0)
           }
@@ -249,7 +244,6 @@ export abstract class SwapRouter {
    * @param trade The MixedRouteTrade to encode.
    * @param options SwapOptions to use for the trade.
    * @param routerMustCustody Flag for whether funds should be sent to the router
-   * @param performAggregatedSlippageCheck Flag for whether we want to perform an aggregated slippage check
    * @returns A string array of calldatas for the trade.
    */
   // private static encodeMixedRouteSwap(
@@ -435,7 +429,6 @@ export abstract class SwapRouter {
   private static encodeSwaps(
     anyTrade: AnyTradeType,
     options: SwapOptions,
-    isSwapAndAdd?: boolean,
   ): {
     calldatas: Hex[]
     sampleTrade: SmartRouterTrade<TradeType>
@@ -471,17 +464,12 @@ export abstract class SwapRouter {
     const inputIsNative = sampleTrade.inputAmount.currency.isNative
     const outputIsNative = sampleTrade.outputAmount.currency.isNative
 
-    // flag for whether we want to perform an aggregated slippage check
-    //   1. when there are >2 exact input trades. this is only a heuristic,
-    //      as it's still more gas-expensive even in this case, but has benefits
-    //      in that the reversion probability is lower
-    const performAggregatedSlippageCheck = sampleTrade.tradeType === TradeType.EXACT_INPUT && numberOfTrades > 2
     // flag for whether funds should be send first to the router
     //   1. when receiving ETH (which much be unwrapped from WETH)
     //   2. when a fee on the output is being taken
     //   3. when performing swap and add
     //   4. when performing an aggregated slippage check
-    const routerMustCustody = outputIsNative || !!options.fee || !!isSwapAndAdd || performAggregatedSlippageCheck
+    const routerMustCustody = outputIsNative || !!options.fee;
 
     // encode permit if necessary
     if (options.inputTokenPermit) {
@@ -497,7 +485,6 @@ export abstract class SwapRouter {
           trade,
           options,
           routerMustCustody,
-          performAggregatedSlippageCheck,
         )) {
           calldatas.push(calldata)
         }

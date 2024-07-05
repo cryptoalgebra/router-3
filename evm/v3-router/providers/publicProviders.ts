@@ -1,5 +1,5 @@
 import { GraphQLClient } from "graphql-request";
-import { createPublicClient, defineChain, http, PublicClient } from "viem";
+import { createPublicClient, defineChain, fallback, http, PublicClient } from "viem";
 import { createQuoteProvider } from "./quoteProviders";
 
 const holeskyChain = defineChain({
@@ -9,10 +9,10 @@ const holeskyChain = defineChain({
   nativeCurrency: { name: 'Holesky Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
     default: {
-      http: ['https://holesky.drpc.org'],
+      http: ['https://ethereum-holesky-rpc.publicnode.com', 'https://holesky.drpc.org'],
     },
     public: {
-      http: ['https://holesky.drpc.org'],
+      http: ['https://ethereum-holesky-rpc.publicnode.com', 'https://holesky.drpc.org'],
     },
   },
   blockExplorers: {
@@ -34,16 +34,15 @@ const holeskyChain = defineChain({
   testnet: true,
 })
 
-
 export const publicClient = createPublicClient({
   chain: holeskyChain,
-  transport: http('https://holesky.drpc.org'),
+  transport: fallback([http("https://ethereum-holesky-rpc.publicnode.com"), http("https://holesky.drpc.org")], { rank: false }),
   batch: {
-    multicall: {
-      batchSize: 1024 * 200,
-    },
+      multicall: {
+          batchSize: 1024 * 200,
+      },
   },
-}) as PublicClient
+}) as PublicClient;
 
 export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,

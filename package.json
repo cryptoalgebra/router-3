@@ -1,5 +1,5 @@
 {
-  "name": "@cryptoalgebra/router-custom-pools",
+  "name": "@cryptoalgebra/router-custom-pools-and-sliding-fee",
   "description": "Router",
   "main": "dist/evm.js",
   "module": "dist/evm.mjs",
@@ -58,5 +58,5 @@
       "require": "./dist/evm.js"
     }
   },
-  "version": "1.2.2"
+  "version": "1.0.0"
 }

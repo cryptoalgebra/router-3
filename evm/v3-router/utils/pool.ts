@@ -144,18 +144,20 @@ export function getTokenPrice(
     );
 
     const price = getStableAmountOut(
-      1000000000000000000n,
+      1n * 10n ** BigInt(base.decimals),
       base.wrapped.address,
       pool.reserve0.currency.wrapped.address,
       pool.reserve1.currency.wrapped.address,
-      BigInt(pool.reserve0.currency.decimals),
-      BigInt(pool.reserve1.currency.decimals),
+      1n * 10n ** BigInt(pool.reserve0.currency.decimals),
+      1n * 10n ** BigInt(pool.reserve1.currency.decimals),
       pool.reserve0.quotient,
       pool.reserve1.quotient,
       1n
     );
 
-    return new Price(base, quote, 1000000000000000000n, price);
+    console.log(pool.reserve0.quotient, pool.reserve1.quotient);
+
+    return new Price(base, quote, 1n * 10n ** BigInt(base.decimals), price);
   }
 
   return new Price(base, quote, BigInt(1), BigInt(0));

@@ -2,27 +2,27 @@ import { ADDRESS_ZERO } from "@cryptoalgebra/custom-pools-sdk";
 import { Address } from "viem";
 
 export const POOL_INIT_CODE_HASH: Address =
-  "0x4b9e4a8044ce5695e06fce9421a63b6f5c3db8a561eebb30ea4c775469e36eaf";
+  "0x19c31d355e8d7bc982508cd49b44c879eaa0dad74e13aa4f42f1a07accb8cd1c";
 
 export const ALGEBRA_POOL_DEPLOYER: Address =
-  "0x4777378A908A90862AdDedabF9388958Cbd020f1";
+  "0xB9f5Bf5c614AC6D00e973a1828EA63FE4dE50A66";
 
 /* V3 */
 export const ALGEBRA_QUOTER: Address =
-  "0x285C74f3d01296F96c5d3858ab482f707e8Bfdfc"; // in use
+  "0x66f7c9A6138fE35E819c9793271B1C07F397C697";
 
 export const ALGEBRA_QUOTER_V2: Address =
-  "0xA064Bcb79F27213b6e39dC4a2E3b977e97489BC9";
+  "0x1Cd90ea701b3019e6E230EACB189F6CA7162845f" // in use;
 
 export const ALGEBRA_ROUTER: Address =
-  "0x54101DF5b3000211d56e869Ce90d5f4628D3dAc9"; // in use
+  "0x8e28cd9D55b1f8be66cD770DBC5B85b99fdB57eb"; // in use
 
 // Pool Deployers
 
 export const CUSTOM_POOL_DEPLOYER_FEE_CHANGER: Address =
-  "0xD10e35b2524043A1BF180c8C932FF15354812191";
+  "0x8440352A89534588078D3286D4b4be9e7F50F819";
 
 export const CUSTOM_POOL_DEPLOYER_BLANK: Address =
-  "0x9198b06527C9ee50E760609270ab222B76Ae66dc";
+  "0x0F5dcA1b04eEDDeF7fECbF2AfF46dC3d6BAfBC7A";
 
 export const CUSTOM_POOL_BASE: Address = ADDRESS_ZERO;

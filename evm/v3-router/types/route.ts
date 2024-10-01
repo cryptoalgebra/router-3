@@ -36,15 +36,26 @@ export type RouteEssentials = Omit<RouteWithoutQuote, 'input' | 'output' | 'amou
 export interface Route extends RouteEssentials {
   inputAmount: CurrencyAmount<Currency>
   outputAmount: CurrencyAmount<Currency>
+  feeList?: bigint[],
+  amountOutList?: bigint[],
+  amountInList?: bigint[],
+  sqrtPriceX96AfterList?: bigint[]
 }
 
 export interface RouteQuote extends GasCost {
   // If exact in, this is (quote - gasCostInToken). If exact out, this is (quote + gasCostInToken).
   quoteAdjustedForGas: CurrencyAmount<Currency>
-  quote: CurrencyAmount<Currency>
+  quote: CurrencyAmount<Currency>,
 }
 
-export type RouteWithQuote = RouteWithoutQuote & RouteQuote
+export interface RouteQuoteV2 {
+  feeList: bigint[],
+  amountOutList: bigint[],
+  amountInList: bigint[],
+  sqrtPriceX96AfterList: bigint[]
+}
+
+export type RouteWithQuote = RouteWithoutQuote & RouteQuote & Partial<RouteQuoteV2>
 
 export type RouteWithoutGasEstimate = Omit<
   RouteWithQuote,

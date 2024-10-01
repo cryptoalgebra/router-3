@@ -103,7 +103,7 @@ export function getBestRouteCombinationByQuotes(
   const quote = CurrencyAmount.fromRawAmount(quoteCurrency, quoteAmount.quotient)
   const isExactIn = tradeType === TradeType.EXACT_INPUT
   return {
-    routes: routes.map(({ type, amount: routeAmount, quote: routeQuoteAmount, pools, path, percent }) => {
+    routes: routes.map(({ type, amount: routeAmount, quote: routeQuoteAmount, pools, path, percent, feeList, sqrtPriceX96AfterList, amountInList, amountOutList }) => {
       const routeQuote = CurrencyAmount.fromRawAmount(quoteCurrency, routeQuoteAmount.quotient)
       return {
         percent,
@@ -112,6 +112,10 @@ export function getBestRouteCombinationByQuotes(
         path,
         inputAmount: isExactIn ? routeAmount : routeQuote,
         outputAmount: isExactIn ? routeQuote : routeAmount,
+        feeList, 
+        sqrtPriceX96AfterList, 
+        amountInList, 
+        amountOutList
       }
     }),
     gasEstimate: estimatedGasUsed,

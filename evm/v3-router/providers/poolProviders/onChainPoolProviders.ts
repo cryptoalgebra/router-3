@@ -84,7 +84,7 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<
 >({
   abi: algebraPoolABI,
   getPossiblePoolMetas: ([currencyA, currencyB]) => {
-    return [CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER].map(
+    return [CUSTOM_POOL_BASE, CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER].map(
       (deployer) => ({
         address: (deployer === CUSTOM_POOL_BASE
           ? computeV3PoolAddress({

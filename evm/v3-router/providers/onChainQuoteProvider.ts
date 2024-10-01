@@ -6,6 +6,7 @@ import { Abi, Address } from 'viem'
 
 import { mixedRouteQuoterV1ABI } from '../../abis/algebra/IMixedRouteQuoterV1'
 import { algebraQuoterABI } from '../../abis/algebra/IQuoter'
+import { algebraQuoterV2ABI } from '../../abis/algebra/IQuoterV2'
 import { MIXED_ROUTE_QUOTER_ADDRESSES, V3_QUOTER_ADDRESSES } from '../../constants'
 import { BATCH_MULTICALL_CONFIGS } from '../../constants'
 import { BatchMulticallConfigs, ChainMap } from '../../types'
@@ -156,8 +157,8 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
             const { results, blockNumber, approxGasUsedPerSuccessCall } =
               await multicall2Provider.callSameFunctionOnContractWithMultipleParams<
                 CallInputs,
-                // amountIn/amountOut, sqrtPriceX96AfterList, initializedTicksCrossedList, gasEstimate
-                [bigint, bigint[], number[], bigint]
+                // amountOutList, amountInList, sqrtPriceX96AfterList, initializedTicksCrossedList, gasEstimate, feeList
+                [bigint[], bigint[], bigint[], number[], bigint, bigint[]]
               >({
                 address: quoterAddress,
                 abi,
@@ -275,7 +276,7 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
 }
 
 function validateSuccessRate(
-  allResults: Result<[bigint, bigint[], number[], bigint]>[],
+  allResults: Result<[bigint[], bigint[], bigint[], number[], bigint, bigint[]]>[],
   quoteMinSuccessRate: number,
 ): undefined | SuccessRateError {
   const numResults = allResults.length
@@ -307,7 +308,7 @@ function validateSuccessRate(
 // }
 
 function processQuoteResults(
-  quoteResults: (Result<[bigint, bigint[], number[], bigint]> | null)[],
+  quoteResults: (Result<[bigint[], bigint[], bigint[], number[], bigint, bigint[]]> | null)[],
   routes: RouteWithoutQuote[],
   gasModel: GasModel,
   adjustQuoteForGas: AdjustQuoteForGasHandler,
@@ -341,20 +342,23 @@ function processQuoteResults(
     }
 
     const quoteCurrency = getQuoteCurrency(route, route.amount.currency)
-    const quote = CurrencyAmount.fromRawAmount(quoteCurrency.wrapped, quoteResult.result[0].toString())
+    const quote = CurrencyAmount.fromRawAmount(quoteCurrency.wrapped, quoteResult.result[0][quoteResult.result[0].length - 1].toString())
     const { gasEstimate, gasCostInToken, gasCostInUSD } = gasModel.estimateGasCost(
       {
         ...route,
         quote,
       },
-      { initializedTickCrossedList: quoteResult.result[2] },
+      { initializedTickCrossedList: quoteResult.result[3] },
     )
 
     routesWithQuote.push({
       ...route,
       quote,
       quoteAdjustedForGas: adjustQuoteForGas({ quote, gasCostInToken }),
-      // sqrtPriceX96AfterList: quoteResult.result[1],
+      feeList: quoteResult.result[5],
+      amountOutList: quoteResult.result[0],
+      amountInList: quoteResult.result[1],
+      sqrtPriceX96AfterList: quoteResult.result[2],
       gasEstimate,
       gasCostInToken,
       gasCostInUSD,
@@ -386,7 +390,7 @@ function processQuoteResults(
 export const createMixedRouteOnChainQuoteProvider = onChainQuoteProviderFactory({
   getQuoterAddress: (chainId) => MIXED_ROUTE_QUOTER_ADDRESSES[chainId],
   getQuoteFunctionName: () => 'quoteExactInput',
-  abi: mixedRouteQuoterV1ABI,
+  abi: algebraQuoterV2ABI,
   getCallInputs: (route, isExactIn) => [
     encodeMixedRouteToPath(route, !isExactIn, false),
     `0x${route.amount.quotient.toString(16)}`,
@@ -396,7 +400,7 @@ export const createMixedRouteOnChainQuoteProvider = onChainQuoteProviderFactory(
 export const createV3OnChainQuoteProvider = onChainQuoteProviderFactory({
   getQuoterAddress: (chainId) => V3_QUOTER_ADDRESSES[chainId],
   getQuoteFunctionName: (isExactIn) => (isExactIn ? 'quoteExactInput' : 'quoteExactOutput'),
-  abi: algebraQuoterABI,
+  abi: algebraQuoterV2ABI,
   getCallInputs: (route, isExactIn) => [
     encodeMixedRouteToPath(route, !isExactIn, true),
     `0x${route.amount.quotient.toString(16)}`,

@@ -7,10 +7,10 @@
   resolved "https://registry.npmjs.org/@adraffy/ens-normalize/-/ens-normalize-1.10.0.tgz"
   integrity sha512-nA9XHtlAkYfJxY7bce8DcN7eKxWWCWkU+1GR9d+U6MbNpfwQp8TI7vqOsBsMcHoT4mBu2kypKoSKnghEzOOq5Q==
 
-"@cryptoalgebra/custom-pools-sdk@npm:@cryptoalgebra/custom-pools-and-sliding-fee-sdk@1.1.2":
-  version "1.1.2"
-  resolved "https://registry.yarnpkg.com/@cryptoalgebra/custom-pools-and-sliding-fee-sdk/-/custom-pools-and-sliding-fee-sdk-1.1.2.tgz#b5828a46c62baefa9534a31f24d7d1a807859475"
-  integrity sha512-73lrru+dJkUfQDO1DYOkJSnb1IhLw6augB1a4TypwlOcSfggYi4gJwuotGSowofGiY6hkyD6Glr9d1prijU54g==
+"@cryptoalgebra/custom-pools-sdk@npm:@cryptoalgebra/custom-pools-and-sliding-fee-sdk@1.2.0":
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/@cryptoalgebra/custom-pools-and-sliding-fee-sdk/-/custom-pools-and-sliding-fee-sdk-1.2.0.tgz#6e67e024295e9c9ede6f5fb4d1a0f3f4bad289f5"
+  integrity sha512-Z8lXraEd2Kh5NosYrBWl+CXQ1PTd/UvLjOh42eW6mqqwOcs7lfIMjrqHXJNlD3/yQ4GY+mqrs14YCk8w+PudpA==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/address" "^5.7.0"

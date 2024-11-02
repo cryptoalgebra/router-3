@@ -240,7 +240,7 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
         }
 
         const { results: quoteResults } = quoteResult
-        const routesWithQuote = processQuoteResults(quoteResults, routes, gasModel, adjustQuoteForGas)
+        const routesWithQuote = processQuoteResults(quoteResults, routes, gasModel, adjustQuoteForGas, isExactIn)
 
         // metric.putMetric('QuoteApproxGasUsedPerSuccessfulCall', approxGasUsedPerSuccessCall, MetricLoggerUnit.Count)
 
@@ -312,6 +312,7 @@ function processQuoteResults(
   routes: RouteWithoutQuote[],
   gasModel: GasModel,
   adjustQuoteForGas: AdjustQuoteForGasHandler,
+  isExactIn: boolean
 ): RouteWithQuote[] {
   const routesWithQuote: RouteWithQuote[] = []
 
@@ -342,7 +343,7 @@ function processQuoteResults(
     }
 
     const quoteCurrency = getQuoteCurrency(route, route.amount.currency)
-    const quote = CurrencyAmount.fromRawAmount(quoteCurrency.wrapped, quoteResult.result[0][quoteResult.result[0].length - 1].toString())
+    const quote = isExactIn ? CurrencyAmount.fromRawAmount(quoteCurrency.wrapped, quoteResult.result[0][quoteResult.result[0].length - 1].toString()) : CurrencyAmount.fromRawAmount(quoteCurrency.wrapped, quoteResult.result[1][quoteResult.result[1].length - 1].toString())
     const { gasEstimate, gasCostInToken, gasCostInUSD } = gasModel.estimateGasCost(
       {
         ...route,

@@ -48,5 +48,5 @@ export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,
 })
 
-export const v3SubgraphClient = new GraphQLClient('https://api.studio.thegraph.com/query/50593/integral-v1-1/version/latest')
+export const v3SubgraphClient = new GraphQLClient('https://api.studio.thegraph.com/query/50593/integral-v12/version/latest')
 export const v2SubgraphClient = new GraphQLClient('https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx')

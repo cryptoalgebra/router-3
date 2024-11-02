@@ -26,7 +26,8 @@ const DEFAULT_BATCH_RETRIES = 2
 
 const SUCCESS_RATE_CONFIG = {
   [ChainId.XLAYER]: 0.1,
-  [ChainId.XLAYER_TESTNET]: 0.1
+  [ChainId.XLAYER_TESTNET]: 0.1,
+  [ChainId.SONIC_TESTNET]: 0.1
 } as const satisfies Record<ChainId, number>
 
 type V3Inputs = [string, string]
@@ -135,7 +136,7 @@ function onChainQuoteProviderFactory({ getQuoteFunctionName, getQuoterAddress, a
         const multicallConfigs =
           multicallConfigsOverride?.[chainId as ChainId] ||
           BATCH_MULTICALL_CONFIGS[chainId as ChainId] ||
-          BATCH_MULTICALL_CONFIGS[ChainId.XLAYER_TESTNET]
+          BATCH_MULTICALL_CONFIGS[ChainId.SONIC_TESTNET]
         const {
           defaultConfig: { gasLimitPerCall: defaultGasLimitPerCall, dropUnexecutedCalls },
         } = multicallConfigs

@@ -17,4 +17,5 @@ const DEFAULT: BatchMulticallConfigs = {
 export const BATCH_MULTICALL_CONFIGS: ChainMap<BatchMulticallConfigs> = {
   [ChainId.XLAYER]: DEFAULT,
   [ChainId.XLAYER_TESTNET]: DEFAULT,
+  [ChainId.SONIC_TESTNET]: DEFAULT
 }

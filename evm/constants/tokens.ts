@@ -1,6 +1,29 @@
 import { ERC20Token } from '@pancakeswap/sdk'
 import { ChainId } from '../chains/src'
 
+export const sonicTestnetTokens = {
+  ws: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0xCE5E585580B22790EA7376842Dbeb78baC23F6C6',
+    18,
+    'WS',
+    'WS'
+  ),
+  usdt: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0x8F98Fce0Fe7f606E2c095Dd1F73577Db77669Bd8',
+    18,
+    'USDT',
+    'USDT'
+  ),
+  swpx: new ERC20Token(
+    ChainId.SONIC_TESTNET,
+    '0xC63CFd74aDe8a090EcCA3De850165C4Eb03b0013',
+    18,
+    'SWPX',
+    'SWPX'
+  ),
+}
 
 export const xLayerTestnetTokens = {
   wokb: new ERC20Token(

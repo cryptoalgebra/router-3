@@ -1,11 +1,12 @@
 import { ChainId } from '../../chains/src'
 import { Token } from '@pancakeswap/sdk'
 
-import { xLayerTestnetTokens } from '../tokens'
+import { sonicTestnetTokens, xLayerTestnetTokens } from '../tokens'
 
 export const usdGasTokensByChain = {
   [ChainId.XLAYER_TESTNET]: [xLayerTestnetTokens.usdt],
-  [ChainId.XLAYER]: []
+  [ChainId.XLAYER]: [],
+  [ChainId.SONIC_TESTNET]: [sonicTestnetTokens.usdt]
 } satisfies Record<ChainId, Token[]>
 
 export * from './stableSwap'

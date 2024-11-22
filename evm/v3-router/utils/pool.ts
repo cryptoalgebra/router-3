@@ -21,7 +21,7 @@ export function computePairAddress(
     )
   );
   return getCreate2Address({
-    from: "0xef6726076b6c155bcb05e2f85fd3b373e049ed4d",
+    from: "0xB8eaDac2B8aB1fE16F0BfCd3Af358ee5EF740936",
     salt,
     bytecodeHash:
       "0x6c45999f36731ff6ab43e943fca4b5a700786bbb202116cf6633b32039161e05",

@@ -1,9 +1,9 @@
 import { Currency, CurrencyAmount, Token, Native } from '@pancakeswap/sdk'
 import { ChainId } from '../chains/src'
-import { xLayerTestnetTokens } from '../constants/tokens'
+import { sonicTestnetTokens } from '../constants/tokens'
 
 export function wrappedCurrency(currency: Currency | undefined, chainId: ChainId): Token | undefined {
-  return currency?.isNative ? xLayerTestnetTokens.wokb : currency?.isToken ? currency : undefined
+  return currency?.isNative ? sonicTestnetTokens.ws : currency?.isToken ? currency : undefined
 }
 
 export function wrappedCurrencyAmount(
@@ -19,6 +19,6 @@ export function unwrappedToken(token: Currency): Currency {
     return token
   }
 
-  if (token.equals(xLayerTestnetTokens.wokb)) return Native.onChain(token.chainId)
+  if (token.equals(sonicTestnetTokens.ws)) return Native.onChain(token.chainId)
   return token
 }

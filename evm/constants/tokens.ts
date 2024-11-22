@@ -4,7 +4,7 @@ import { ChainId } from '../chains/src'
 export const sonicTestnetTokens = {
   ws: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0xCE5E585580B22790EA7376842Dbeb78baC23F6C6',
+    '0xb621330f2f6fd60503969cfd87ed33b3ee925e36',
     18,
     'WS',
     'WS'

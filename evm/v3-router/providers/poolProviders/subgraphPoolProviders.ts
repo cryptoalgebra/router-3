@@ -25,6 +25,7 @@ import {
   CUSTOM_POOL_BASE,
   CUSTOM_POOL_DEPLOYER_BLANK,
   CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+  CUSTOM_POOL_DEPLOYER_LIMIT_ORDER,
   POOL_INIT_CODE_HASH,
 } from "../../../constants/addresses";
 
@@ -75,6 +76,7 @@ function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
         CUSTOM_POOL_BASE,
         CUSTOM_POOL_DEPLOYER_BLANK,
         CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
+        CUSTOM_POOL_DEPLOYER_LIMIT_ORDER
       ]) {
         const metas = getPoolMetas(pair, deployer);
         for (const meta of metas) {

@@ -1,5 +1,5 @@
 {
-  "name": "@cryptoalgebra/router-custom-pools-and-sliding-fee",
+  "name": "@cryptoalgebra/router-daikon",
   "description": "Router",
   "main": "dist/evm.js",
   "module": "dist/evm.mjs",
@@ -19,7 +19,7 @@
     "dist"
   ],
   "dependencies": {
-    "@cryptoalgebra/custom-pools-sdk": "npm:@cryptoalgebra/custom-pools-and-sliding-fee-sdk@1.2.0",
+    "@cryptoalgebra/custom-pools-sdk": "npm:@cryptoalgebra/daikon-sdk@1.0.0",
     "@pancakeswap/sdk": "5.7.6",
     "@pancakeswap/swap-sdk-core": "1.0.0",
     "@pancakeswap/token-lists": "0.0.9",
@@ -58,5 +58,5 @@
       "require": "./dist/evm.js"
     }
   },
-  "version": "1.4.2"
+  "version": "1.0.0"
 }

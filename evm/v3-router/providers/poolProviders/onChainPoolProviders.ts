@@ -22,8 +22,6 @@ import { PoolMeta, V3PoolMeta } from "./internalTypes";
 import {
   ALGEBRA_POOL_DEPLOYER,
   CUSTOM_POOL_BASE,
-  CUSTOM_POOL_DEPLOYER_BLANK,
-  CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
   CUSTOM_POOL_DEPLOYER_LIMIT_ORDER,
   POOL_INIT_CODE_HASH,
 } from "../../../constants/addresses";
@@ -85,7 +83,7 @@ export const getV3PoolsWithoutTicksOnChain = createOnChainPoolFactory<
 >({
   abi: algebraPoolABI,
   getPossiblePoolMetas: ([currencyA, currencyB]) => {
-    return [CUSTOM_POOL_BASE ,CUSTOM_POOL_DEPLOYER_BLANK, CUSTOM_POOL_DEPLOYER_FEE_CHANGER, CUSTOM_POOL_DEPLOYER_LIMIT_ORDER].map(
+    return [CUSTOM_POOL_BASE ,CUSTOM_POOL_DEPLOYER_LIMIT_ORDER].map(
       (deployer) => ({
         address: (deployer === CUSTOM_POOL_BASE
           ? computeV3PoolAddress({

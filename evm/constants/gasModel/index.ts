@@ -4,7 +4,7 @@ import { Token } from '@pancakeswap/sdk'
 import { holeskyTokens } from '../tokens'
 
 export const usdGasTokensByChain = {
-  [ChainId.HOLESKY]: [holeskyTokens.usdt],
+  [ChainId.KAKAROT_SEPOLIA]: [holeskyTokens.usdt],
 } satisfies Record<ChainId, Token[]>
 
 export * from './stableSwap'

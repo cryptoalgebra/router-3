@@ -19,5 +19,5 @@ export function getMulticallContract({ chainId, client }: Params) {
 }
 
 export function getMulticall3ContractAddress(chainId?: ChainId): Address {
-  return MULTICALL3_ADDRESSES[chainId || ChainId.HOLESKY] || '0xca11bde05977b3631167028862be2a173976ca11'
+  return MULTICALL3_ADDRESSES[chainId || ChainId.KAKAROT_SEPOLIA] || '0x6d63b39017f379bfd0301293022581c6ef237a19'
 }

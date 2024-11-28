@@ -1,7 +1,7 @@
 export enum ChainId {
-  HOLESKY = 17000
+  KAKAROT_SEPOLIA = 920637907288165
 }
 
 export const testnetChainIds = [
-  ChainId.HOLESKY
+  ChainId.KAKAROT_SEPOLIA
 ]

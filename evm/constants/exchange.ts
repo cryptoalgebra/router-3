@@ -6,12 +6,12 @@ import { ALGEBRA_ROUTER } from './addresses'
 import { holeskyTokens } from './tokens'
 
 export const SMART_ROUTER_ADDRESSES = {
-  [ChainId.HOLESKY]: ALGEBRA_ROUTER,
+  [ChainId.KAKAROT_SEPOLIA]: ALGEBRA_ROUTER,
 } as const satisfies Record<ChainId, string>
 
 // used to construct intermediary pairs for trading
 export const BASES_TO_CHECK_TRADES_AGAINST: ChainTokenList = {
-  [ChainId.HOLESKY]: Object.values(holeskyTokens),
+  [ChainId.KAKAROT_SEPOLIA]: Object.values(holeskyTokens),
 }
 
 

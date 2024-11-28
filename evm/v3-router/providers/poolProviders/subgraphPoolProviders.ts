@@ -23,8 +23,6 @@ import { PoolMeta, V3PoolMeta } from "./internalTypes";
 import {
   ALGEBRA_POOL_DEPLOYER,
   CUSTOM_POOL_BASE,
-  CUSTOM_POOL_DEPLOYER_BLANK,
-  CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
   CUSTOM_POOL_DEPLOYER_LIMIT_ORDER,
   POOL_INIT_CODE_HASH,
 } from "../../../constants/addresses";
@@ -74,8 +72,6 @@ function subgraphPoolProviderFactory<M extends PoolMeta, P extends WithTvl>({
     for (const pair of pairs) {
       for (const deployer of [
         CUSTOM_POOL_BASE,
-        CUSTOM_POOL_DEPLOYER_BLANK,
-        CUSTOM_POOL_DEPLOYER_FEE_CHANGER,
         CUSTOM_POOL_DEPLOYER_LIMIT_ORDER
       ]) {
         const metas = getPoolMetas(pair, deployer);

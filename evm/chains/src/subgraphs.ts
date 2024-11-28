@@ -19,20 +19,20 @@ export const STABLESWAP_SUBGRAPHS = {} as const;
 
 export function getV3Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.HOLESKY]:
-      "https://api.studio.thegraph.com/query/50593/integral-v12/version/latest",
+    [ChainId.KAKAROT_SEPOLIA]:
+      "https://query.kakarot.protofire.io/subgraphs/name/kakarot/algebra-analytics",
   } as const satisfies Record<ChainId, string | null>;
 }
 
 export function getV2Subgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    // [ChainId.HOLESKY]: 'https://api.studio.thegraph.com/query/82608/quick-test-info/version/latest'
+    // [ChainId.KAKAROT_SEPOLIA]: 'https://api.studio.thegraph.com/query/82608/quick-test-info/version/latest'
   };
 }
 
 export function getBlocksSubgraphs({ noderealApiKey }: SubgraphParams) {
   return {
-    [ChainId.HOLESKY]:
-      "https://api.thegraph.com/subgraphs/name/iliaazhel/goerli-blocks",
+    [ChainId.KAKAROT_SEPOLIA]:
+      "https://query.kakarot.protofire.io/subgraphs/name/kakarot/blocks",
   } as const;
 }

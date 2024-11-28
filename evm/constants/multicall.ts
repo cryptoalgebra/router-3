@@ -15,5 +15,5 @@ const DEFAULT: BatchMulticallConfigs = {
 }
 
 export const BATCH_MULTICALL_CONFIGS: ChainMap<BatchMulticallConfigs> = {
-  [ChainId.HOLESKY]: DEFAULT,
+  [ChainId.KAKAROT_SEPOLIA]: DEFAULT,
 }

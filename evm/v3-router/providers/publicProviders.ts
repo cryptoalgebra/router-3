@@ -2,41 +2,41 @@ import { GraphQLClient } from "graphql-request";
 import { createPublicClient, defineChain, fallback, http, PublicClient } from "viem";
 import { createQuoteProvider } from "./quoteProviders";
 
-const holeskyChain = defineChain({
-  id: 17000,
-  network: 'holesky',
-  name: 'Holesky',
-  nativeCurrency: { name: 'Holesky Ether', symbol: 'ETH', decimals: 18 },
+const kakarotChain = defineChain({
+  id: 920637907288165,
+  network: 'kakarot-sepolia',
+  name: 'Kakarot',
+  nativeCurrency: { name: 'Kakarot Ether', symbol: 'ETH', decimals: 18 },
   rpcUrls: {
     default: {
-      http: ['https://ethereum-holesky-rpc.publicnode.com', 'https://holesky.drpc.org'],
+      http: ['https://sepolia-rpc.kakarot.org'],
     },
     public: {
-      http: ['https://ethereum-holesky-rpc.publicnode.com', 'https://holesky.drpc.org'],
+      http: ['https://sepolia-rpc.kakarot.org'],
     },
   },
   blockExplorers: {
     etherscan: {
-      name: 'Etherscan',
-      url: 'https://holesky.etherscan.io',
+      name: 'Kakarotscan',
+      url: 'https://sepolia.kakarotscan.org',
     },
     default: {
-      name: 'Etherscan',
-      url: 'https://holesky.etherscan.io',
+      name: 'Kakarotscan',
+      url: 'https://sepolia.kakarotscan.org',
     },
   },
   contracts: {
     multicall3: {
-      address: '0xca11bde05977b3631167028862be2a173976ca11',
-      blockCreated: 77,
+      address: '0x6d63b39017f379bfd0301293022581c6ef237a19',
+      blockCreated: 348826,
     },
   },
   testnet: true,
 })
 
 export const publicClient = createPublicClient({
-  chain: holeskyChain,
-  transport: fallback([http("https://ethereum-holesky-rpc.publicnode.com"), http("https://holesky.drpc.org")], { rank: false }),
+  chain: kakarotChain,
+  transport: fallback([http("https://sepolia-rpc.kakarot.org"), http("https://sepolia-rpc.kakarot.org")], { rank: false }),
   batch: {
       multicall: {
           batchSize: 1024 * 200,
@@ -48,5 +48,5 @@ export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,
 })
 
-export const v3SubgraphClient = new GraphQLClient('https://api.studio.thegraph.com/query/50593/integral-v12/version/latest')
+export const v3SubgraphClient = new GraphQLClient('https://query.kakarot.protofire.io/subgraphs/name/kakarot/algebra-analytics')
 export const v2SubgraphClient = new GraphQLClient('https://swapx-graph.rocknblock.io/subgraphs/name/swapx/swapx')

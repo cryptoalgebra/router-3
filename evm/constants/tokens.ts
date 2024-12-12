@@ -4,21 +4,21 @@ import { ChainId } from '../chains/src'
 export const sonicTestnetTokens = {
   ws: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0xb621330f2f6fd60503969cfd87ed33b3ee925e36',
+    '0x845e4145F7de2822d16FE233Ecd0181c61f1d65F',
     18,
     'WS',
     'WS'
   ),
   usdt: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0x8F98Fce0Fe7f606E2c095Dd1F73577Db77669Bd8',
+    '0x9b79fAc45BBcBf4FdA9923CC523b1342Dfb86E0f',
     18,
     'USDT',
     'USDT'
   ),
   swpx: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0xC63CFd74aDe8a090EcCA3De850165C4Eb03b0013',
+    '0x5803e430CE1867Ce426993e58Ad76946E622f592',
     18,
     'SWPX',
     'SWPX'

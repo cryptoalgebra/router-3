@@ -30,7 +30,7 @@ export const xLayerTestnet = defineChain({
 });
 
 export const sonicTestnet = defineChain({
-  id: 64165,
+  id: 57054,
   network: 'Sonic Testnet',
   name: 'Sonic Testnet',
   nativeCurrency: {
@@ -39,19 +39,19 @@ export const sonicTestnet = defineChain({
     symbol: 'S',
   },
   rpcUrls: {
-    public: { http: ['https://rpc.testnet.soniclabs.com'] },
-    default: { http: ['https://rpc.testnet.soniclabs.com'] },
+    public: { http: ['https://rpc.blaze.soniclabs.com'] },
+    default: { http: ['https://rpc.blaze.soniclabs.com'] },
   },
   blockExplorers: {
     default: {
       name: 'Sonic',
-      url: 'https://testnet.soniclabs.com',
+      url: 'https://explorer.blaze.soniclabs.com',
     },
   },
   contracts: {
     multicall3: {
-      address: '0xe3104a157cc4c0d3c7c3a8c655092668d068c149',
-      blockCreated: 83325506,
+      address: '0x50fcbf85d23af7c91f94842fecd83d16665d27ba',
+      blockCreated: 2627734,
     },
   },
 });
@@ -60,7 +60,7 @@ export const sonicTestnet = defineChain({
 
 export const publicClient = createPublicClient({
   chain: sonicTestnet,
-  transport: http('https://rpc.testnet.soniclabs.com'),
+  transport: http('https://rpc.blaze.soniclabs.com'),
   batch: {
     multicall: {
       batchSize: 1024 * 200,
@@ -72,5 +72,5 @@ export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,
 })
 
-export const v3SubgraphClient = new GraphQLClient('https://graph.testnet.soniclabs.com/gql/subgraphs/name/joxerx/swapx')
-export const v2SubgraphClient = new GraphQLClient('https://graph.testnet.soniclabs.com/gql/subgraphs/name/joxerx/swapx')
+export const v3SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx')
+export const v2SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx')

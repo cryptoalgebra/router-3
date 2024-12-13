@@ -72,5 +72,5 @@ export const quoteProvider = createQuoteProvider({
   onChainProvider: () => publicClient,
 })
 
-export const v3SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx')
-export const v2SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx')
+export const v3SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx-plugin/')
+export const v2SubgraphClient = new GraphQLClient('https://sonic-graph.rocknblock.io/subgraphs/name/swapx-plugin/')

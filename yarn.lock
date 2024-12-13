@@ -24,10 +24,10 @@
     tiny-warning "^1.0.3"
     toformat "^2.0.0"
 
-"@cryptoalgebra/swapx-sdk@^1.2.0":
-  version "1.2.0"
-  resolved "https://registry.yarnpkg.com/@cryptoalgebra/swapx-sdk/-/swapx-sdk-1.2.0.tgz#adde6758a2f571b49b9484ad9015e349d039a8ee"
-  integrity sha512-r98EaYnGjSAT57AyLVmnYaQ9imEJKoG+zSrl7dvhDF2RkyVt44DV3T5HWNgAyPqJZksXK1kjvkOvjxn2mnQPCA==
+"@cryptoalgebra/swapx-sdk@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@cryptoalgebra/swapx-sdk/-/swapx-sdk-1.2.1.tgz#d94793b65558757ef6c9598846fbdacab4776181"
+  integrity sha512-mZypxrnyNsGW49dnxPVOktn6pIzKL0fawE2DJUE7Xh3oFDHf1z+QgaiVWL4tsnjdhnG6HuWH3VaScfxBEKO6LQ==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/address" "^5.7.0"

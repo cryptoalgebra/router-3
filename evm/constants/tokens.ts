@@ -11,14 +11,14 @@ export const sonicTestnetTokens = {
   ),
   usdt: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0x9b79fAc45BBcBf4FdA9923CC523b1342Dfb86E0f',
+    '0x2cC8Bd37EBB051A9126D34b9b3f4431CF6263Db6',
     18,
     'USDT',
     'USDT'
   ),
   swpx: new ERC20Token(
     ChainId.SONIC_TESTNET,
-    '0x5803e430CE1867Ce426993e58Ad76946E622f592',
+    '0xeFa92Da8244c506BaFaf79e823a7aF129C37f6d9',
     18,
     'SWPX',
     'SWPX'
